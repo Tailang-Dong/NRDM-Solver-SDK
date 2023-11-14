@@ -1,41 +1,41 @@
 #pragma once
-//½ÚµãNode2DÀà
-//ÀàÄÚ³ÉÔ±Êı¾İ
+//èŠ‚ç‚¹Node2Dç±»
+//ç±»å†…æˆå‘˜æ•°æ®
 class Node2D
 {
 public:
-	double X[2];//1-1½Úµã×ø±ê. coordinate
-	bool IfBoundary;//1-2-1ÄÚ²¿µã/±ß½çµã
-	double n[2];//1-2-2·½Ïò out-of-boundary normal vector
-	double r;//2-1ÁÙ½üÓò°ë¾¶ influence radius
-	int Nei;//2-2ÁÙ½üµãÊı number of neighbors
-	bool Fixed[2];//3-1ÊÇ·ñ¹Ì¶¨ if fixed
-	double Force[2];//3-2ÔØºÉ load
-	double R[2];//4-1ÓàÁ¿ residual
-	double displacement[2];//½ÚµãÎ»ÒÆ5-1. displacement
-	double epsilon[2][2];//½ÚµãÓ¦±ä5-2. strain
-	double sigma[2][2];//½ÚµãÓ¦Á¦5-3. stress
+	double X[2];//1-1èŠ‚ç‚¹åæ ‡. coordinate
+	bool IfBoundary;//1-2-1å†…éƒ¨ç‚¹/è¾¹ç•Œç‚¹
+	double n[2];//1-2-2æ–¹å‘ out-of-boundary normal vector
+	double r;//2-1ä¸´è¿‘åŸŸåŠå¾„ influence radius
+	int Nei;//2-2ä¸´è¿‘ç‚¹æ•° number of neighbors
+	bool Fixed[2];//3-1æ˜¯å¦å›ºå®š if fixed
+	double Force[2];//3-2è½½è· load
+	double R[2];//4-1ä½™é‡ residual
+	double displacement[2];//èŠ‚ç‚¹ä½ç§»5-1. displacement
+	double epsilon[2][2];//èŠ‚ç‚¹åº”å˜5-2. strain
+	double sigma[2][2];//èŠ‚ç‚¹åº”åŠ›5-3. stress
 };
 
-//½ÚµãNode3DÀà
-//ÀàÄÚ³ÉÔ±Êı¾İ
+//èŠ‚ç‚¹Node3Dç±»
+//ç±»å†…æˆå‘˜æ•°æ®
 class Node3D
 {
 public:
-	double X[3];//1-1½Úµã×ø±êcoordinate
-	bool IfBoundary;//1-2-1ÄÚ²¿µã/±ß½çµã
-	double n[3];//1-2-2·½Ïòout-of-boundary normal vector
-	double r;//2-1ÁÙ½üÓò°ë¾¶influence radius
-	int Nei;//2-2ÁÙ½üµãÊınumber of neighbors
-	bool Fixed[3];//3-1ÊÇ·ñ¹Ì¶¨if fixed
-	double Force[3];//3-2ÔØºÉload
-	double R[3];//4-1ÓàÁ¿residual
-	double displacement[3];//½ÚµãÎ»ÒÆ5-1displacement
-	double epsilon[3][3];//½ÚµãÓ¦±ä5-2strain
-	double sigma[3][3];//½ÚµãÓ¦Á¦5-3stress
+	double X[3];//1-1èŠ‚ç‚¹åæ ‡coordinate
+	bool IfBoundary;//1-2-1å†…éƒ¨ç‚¹/è¾¹ç•Œç‚¹
+	double n[3];//1-2-2æ–¹å‘out-of-boundary normal vector
+	double r;//2-1ä¸´è¿‘åŸŸåŠå¾„influence radius
+	int Nei;//2-2ä¸´è¿‘ç‚¹æ•°number of neighbors
+	bool Fixed[3];//3-1æ˜¯å¦å›ºå®šif fixed
+	double Force[3];//3-2è½½è·load
+	double R[3];//4-1ä½™é‡residual
+	double displacement[3];//èŠ‚ç‚¹ä½ç§»5-1displacement
+	double epsilon[3][3];//èŠ‚ç‚¹åº”å˜5-2strain
+	double sigma[3][3];//èŠ‚ç‚¹åº”åŠ›5-3stress
 };
 
-//ÀàÍâÈ«¾Ö±äÁ¿
+//ç±»å¤–å…¨å±€å˜é‡
 //2-3number of Nodes
 extern int Num_m;
 //2-4Number of Neighbors
@@ -44,47 +44,47 @@ extern int* N_Nei;
 extern int** GlobalIndex_Nei;
 //2-6Vect[m][Nei][2] is the connectivity matrix of the m-th Node
 extern double*** Vect;
-extern double E;//0-1µ¯ĞÔÄ£Á¿Young's modulus
-extern double nu;//0-2²´ËÉ±ÈPoisson's ratio
-extern double G;//0-3¼ôÇĞÄ£Á¿shear modulus
+extern double E;//0-1å¼¹æ€§æ¨¡é‡Young's modulus
+extern double nu;//0-2æ³Šæ¾æ¯”Poisson's ratio
+extern double G;//0-3å‰ªåˆ‡æ¨¡é‡shear modulus
 
-//ÀàÍâº¯ÊıFunctions out of class
-//2-1¼¸ºÎ·½³Ìgeometric equation solver
+//ç±»å¤–å‡½æ•°Functions out of class
+//2-1å‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim, double tolerance);
 
-//2-2±¾¹¹·½³Ìconstitutive equation solver
+//2-2æœ¬æ„æ–¹ç¨‹constitutive equation solver
 void Stress_from_Strain(double** sigma, double E, double nu, double G, double** epsilon, int Dim);
-//2DÆ½ÃæÓ¦Á¦2D plane stress
+//2Då¹³é¢åº”åŠ›2D plane stress
 void Stress_from_Strain2D(double** sigma, double E, double nu, double G, double** epsilon, int Dim);
 //3D
 void Stress_from_Strain3D(double** sigma, double E, double nu, double G, double** epsilon, int Dim);
 
-//2-3Ó¦Á¦ËãÄÚÁ¦evaluate internal force from stress
-//2-3-1Ó¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã on internal nodes
+//2-3åº”åŠ›ç®—å†…åŠ›evaluate internal force from stress
+//2-3-1åº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹ on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim, double tolerance);
-//2-3-2Ó¦Á¦ËãÄÚÁ¦-±ß½çµã on boundary nodes
+//2-3-2åº”åŠ›ç®—å†…åŠ›-è¾¹ç•Œç‚¹ on boundary nodes
 void InForce_from_Stress_bdy(double* inforce, double** sigma_m, double* n, int Dim);
 
 /*overload I. call inverse matrix method to solve matrix equation*/
-/*ÖØ¹¹ I. ·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â*/
-//2-1-I¼¸ºÎ·½³Ìgeometric equation solver
+/*é‡æ„ I. æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£*/
+//2-1-Iå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim);
 
-//2-3-1-IÓ¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã. evaluate internal force from stress, on internal nodes
+//2-3-1-Iåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹. evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim);
 
 /*overload II. call inverse matrix method to solve matrix equation, need Inverse_VecTVec[][]*/
-/*ÖØ¹¹ II. ·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â,ĞèÒªInverse_VecTVec[][]*/
-//2-1-II¼¸ºÎ·½³Ìgeometric equation solver
+/*é‡æ„ II. æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£,éœ€è¦Inverse_VecTVec[][]*/
+//2-1-IIå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** Inverse_VecTVec, double** disp_nei, double* disp_m, int n_nei, int Dim);
 
-//2-3-1-IIÓ¦Á¦ËãÄÚÁ¦-ÄÚ²¿µãevaluate internal force from stress, on internal nodes
+//2-3-1-IIåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double** Inverse_VecTVec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim);
 
 /*overload III. call inverse matrix method to solve matrix equation, weighted least square option*/
-/*ÖØ¹¹III-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â,¾ßÓĞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî*/
-//2-1-III¼¸ºÎ·½³Ìgeometric equation solver
+/*é‡æ„III-æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£,å…·æœ‰åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹*/
+//2-1-IIIå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim, bool WeightedLeastSquares);
 
-//2-3-1-IIIÓ¦Á¦ËãÄÚÁ¦-ÄÚ²¿µãevaluate internal force from stress, on internal nodes
+//2-3-1-IIIåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim, bool WeightedLeastSquares);

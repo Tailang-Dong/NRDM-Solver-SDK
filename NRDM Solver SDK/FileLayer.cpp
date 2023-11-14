@@ -1,15 +1,15 @@
 #include "FileLayer.h"
 
-std::ifstream InputProjectFile;//ÏîÄ¿ÎÄ¼şÊäÈëÁ÷.InputProjectFile ifstream
-std::ifstream InputConfigureFile;//ÅäÖÃÎÄ¼şÊäÈëÁ÷.InputConfigureFile ifstream
+std::ifstream InputProjectFile;//é¡¹ç›®æ–‡ä»¶è¾“å…¥æµ.InputProjectFile ifstream
+std::ifstream InputConfigureFile;//é…ç½®æ–‡ä»¶è¾“å…¥æµ.InputConfigureFile ifstream
 
-std::ifstream mfin;//¶ÁÈ¡Ä£ĞÍÎÄ¼şÊäÈëÁ÷ifstream to read the model file
-std::ofstream fout;//½á¹ûÊä³öofstream to write the result file
-std::ofstream LongSecfout;//×İ½ØÃæ½á¹ûÊä³öofstream to write the result file. Longitudinal Section
-std::ofstream CrossSecfout;//ºá½ØÃæ½á¹ûÊä³öofstream to write the result file. Cross Section
+std::ifstream mfin;//è¯»å–æ¨¡å‹æ–‡ä»¶è¾“å…¥æµifstream to read the model file
+std::ofstream fout;//ç»“æœè¾“å‡ºofstream to write the result file
+std::ofstream LongSecfout;//çºµæˆªé¢ç»“æœè¾“å‡ºofstream to write the result file. Longitudinal Section
+std::ofstream CrossSecfout;//æ¨ªæˆªé¢ç»“æœè¾“å‡ºofstream to write the result file. Cross Section
 std::ofstream Itfout;//ofstream to write the result file. record the iteration curves.
-std::ofstream RelaxOut;//ËÉ³Ú¼ÇÂ¼ofstream to write the result file. record the iterations.
+std::ofstream RelaxOut;//æ¾å¼›è®°å½•ofstream to write the result file. record the iterations.
 
-std::ofstream LogFout;//ÈÕÖ¾¼ÇÂ¼
+std::ofstream LogFout;//æ—¥å¿—è®°å½•
 
-double SpecificResidual_Max=0;//¼ÇÂ¼ËùÓĞ½ÚµãµÄÎŞÁ¿¸ÙÓàÁ¿¸÷·ÖÁ¿µÄ×î´óÖµrecord the R^s_max
+double SpecificResidual_Max=0;//è®°å½•æ‰€æœ‰èŠ‚ç‚¹çš„æ— é‡çº²ä½™é‡å„åˆ†é‡çš„æœ€å¤§å€¼record the R^s_max
