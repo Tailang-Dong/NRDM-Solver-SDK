@@ -2,50 +2,169 @@
 #include "MathLayer.h"
 #include <iostream>
 
-//3-1±êÁ¿Ìİ¶È
-void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, double tolerance)
+/*****é€šç”¨ç‰©ç†å±‚æºæ–‡ä»¶, å‡½æ•°å£°æ˜. Source of GeneralPhysicsLayer, Founctions Definitions.******/
+
+/***æœ€å¸¸ç”¨ï¼Œè¢«åŠ›å­¦å±‚çœŸæ­£è°ƒç”¨çš„.  most commonly called, Called by the mechanics layer***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ˜¯å¦é‡‡ç”¨åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹, Dim=2 or 3. call inverse method to solve matrix equation, with weighted least squares option.*/
+//3-1
+void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, bool WeightedLeastSquares)
 {
-	double* dphi = new double[n_nei];//3-1-1ÉèÁÙÊ±±äÁ¿dphi[]
+	double* dphi = new double[n_nei];//3-1-1è®¾ä¸´æ—¶å˜é‡dphi[]
 	for (int n = 0; n < n_nei; n++)
 		dphi[n] = phi_nei[n] - phi_m;
-	LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim, tolerance);//3-1-2µ÷ÓÃ4-3Çó½âÌİ¶È
-	delete[] dphi;//3-1-3ÊÍ·ÅÁÙÊ±±äÁ¿dphi[]
+	if (WeightedLeastSquares == 1)//å¦‚æœé‡‡ç”¨åŠ æƒæœ€å°äºŒä¹˜æ„é€ 
+	{
+		//å‡†å¤‡åŠ æƒçš„å¯¼æ•°çŸ©é˜µå’ŒåŠ æƒçš„å¸¸æ•°å‘é‡
+		double** WeightVec = new double* [n_nei];
+		for (int n = 0; n < n_nei; n++)
+			WeightVec[n] = new double[Dim];//é‡‡ç”¨åŠ æƒçš„å¯¼æ•°çŸ©é˜µ-å±€éƒ¨å˜é‡
+		double DistanceSquare_CenterNeighbor;//ä¸´æ—¶çš„å±€éƒ¨å˜é‡ä¸­å¿ƒç‚¹å¯¼ä¸´è¿‘ç‚¹
+		for (int n = 0; n < n_nei; n++)
+		{
+			DistanceSquare_CenterNeighbor = 0;
+			for (int i = 0; i < Dim; i++)
+				DistanceSquare_CenterNeighbor += Vec[n][i] * Vec[n][i];//è®¡ç®—ç¬¬nä¸ªNeighborçš„è·ç¦»å¹³æ–¹
+			dphi[n] = dphi[n] / DistanceSquare_CenterNeighbor;//åŠ æƒçš„å¯¼æ•°çŸ©é˜µ
+			for (int i = 0; i < Dim; i++)
+				WeightVec[n][i] = Vec[n][i] / DistanceSquare_CenterNeighbor;//åŠ æƒçš„å¸¸æ•°å‘é‡
+		}
+		LeastSquareSolution(Gradphi, WeightVec, dphi, n_nei, Dim);
+		for (int n = 0; n < n_nei; n++)//é‡Šæ”¾åŠ æƒçš„å¯¼æ•°çŸ©é˜µ
+			delete[] WeightVec[n];
+		delete[] WeightVec;
+	}
+	else
+		LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim);//3-1-2è°ƒç”¨4-3æ±‚è§£æ¢¯åº¦//ä¸é‡‡ç”¨åŠ æƒæœ€å°äºŒä¹˜æ„é€ 
+	delete[] dphi;//3-1-3é‡Šæ”¾ä¸´æ—¶å˜é‡dphi[]
 
 }
 
-//3-2Ê¸Á¿EµÄÌİ¶È E_nei[n_nei][Dim]
-void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, double tolerance)
+
+//3-2
+void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares)
 {
-	//3-2-1ÉèÁÙÊ±±äÁ¿Gradphi[] phi_nei[] phi_m
-	double* Gradphi = new double[Dim];//Ê¸Á¿µÄÃ¿¸ö·ÖÁ¿×÷Îª±êÁ¿À´·Ö±ğ¼ÆËãÌİ¶È
+	//3-2-1è®¾ä¸´æ—¶å˜é‡Gradphi[] phi_nei[] phi_m
+	double* Gradphi = new double[Dim];//çŸ¢é‡çš„æ¯ä¸ªåˆ†é‡ä½œä¸ºæ ‡é‡æ¥åˆ†åˆ«è®¡ç®—æ¢¯åº¦
 	double* phi_nei = new double[n_nei];
 	double phi_m;
-	//3-2-2µ÷ÓÃ3-1¼ÆËãÃ¿¸ö·ÖÁ¿µÄÌİ¶È
-	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeµÚd_attriV¸ö·ÖÁ¿,Öğ¸ö·ÖÁ¿¼ÆËã
+	//3-2-2è°ƒç”¨3-1è®¡ç®—æ¯ä¸ªåˆ†é‡çš„æ¢¯åº¦
+	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeç¬¬d_attriVä¸ªåˆ†é‡,é€ä¸ªåˆ†é‡è®¡ç®—
 	{
-		for (int n = 0; n < n_nei; n++)//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿¿´×÷Ò»¸ö±êÁ¿phi
+		for (int n = 0; n < n_nei; n++)//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çœ‹ä½œä¸€ä¸ªæ ‡é‡phi
 		{
 			phi_nei[n] = E_nei[n][d_attriV];
 			phi_m = E_m[d_attriV];
 		}
-		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim, tolerance);//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿µÄÌİ¶È
+		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim, WeightedLeastSquares);//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çš„æ¢¯åº¦,è°ƒç”¨å…·æœ‰åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹çš„å‡½æ•°
 		for (int dcol = 0; dcol < Dim; dcol++)
-			GradE[d_attriV][dcol] = Gradphi[dcol]; //¸³Öµ¸øÕÅÁ¿GradE[][]µÄµÚd_attriVĞĞ
+			GradE[d_attriV][dcol] = Gradphi[dcol]; //èµ‹å€¼ç»™å¼ é‡GradE[][]çš„ç¬¬d_attriVè¡Œ
 	}
-	//3-2-3ÊÍ·Å¾Ö²¿±äÁ¿ÄÚ´æ
+	//3-2-3é‡Šæ”¾å±€éƒ¨å˜é‡å†…å­˜
 	delete[] Gradphi;
 	delete[] phi_nei;
 
 }
 
-//3-3Ê¸Á¿EµÄÉ¢¶È
-void Divergence_of_Vector(double &DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, double tolerance)
+//3-3
+void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares)
 {
-	//3-3-1ÉèÁÙÊ±±äÁ¿GradE[][]
+	//3-3-1è®¾ä¸´æ—¶å˜é‡GradE[][]
 	double** GradE = new double* [Dim];
 	for (int i = 0; i < Dim; i++)
 		GradE[i] = new double[Dim];
-	//3-3-2µ÷ÓÃ3-2¼ÆËãÊ¸Á¿Ìİ¶ÈGradE
+	//3-3-2è°ƒç”¨3-2è®¡ç®—çŸ¢é‡æ¢¯åº¦GradE
+	Gradient_of_Vector(GradE, Vec, E_nei, E_m, n_nei, Dim, WeightedLeastSquares);//è°ƒç”¨å…·æœ‰åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹çš„å‡½æ•°
+	//3-3-3trace of GradE=DivE
+	DivE = 0;
+	for (int i = 0; i < Dim; i++)
+		for (int j = 0; j < Dim; j++)
+		{
+			if (j == i)
+				DivE = DivE + GradE[i][j];
+		}
+	//3-3-4é‡Šæ”¾ä¸´æ—¶å†…å­˜GradE[][]
+	for (int i = 0; i < Dim; i++)
+		delete[] GradE[i];
+	delete[] GradE;
+}
+
+//3-4
+void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim, bool WeightedLeastSquares)
+{
+	//æ¯ä¸€åˆ—çš„æ•£åº¦T=[E0, E1,]
+	//3-4-1ä¸´æ—¶å˜é‡Ej_nei[n_nei][Dim], Ej_m[Dim]
+	double DivEj = 0;
+	double** Ej_nei = new double* [n_nei];
+	for (int d = 0; d < n_nei; d++)
+		Ej_nei[d] = new double[Dim];
+	double* Ej_m = new double[Dim];
+
+	for (int j = 0; j < Dim; j++)
+	{
+		for (int d = 0; d < n_nei; d++)
+			for (int i = 0; i < Dim; i++)
+				Ej_nei[d][i] = T_nei[d][i][j];//ç¬¬jåˆ—
+		for (int i = 0; i < Dim; i++)
+			Ej_m[i] = T_m[i][j];
+
+		//3-4-2è°ƒç”¨3-3æ±‚ç¬¬jåˆ—çš„æ•£åº¦
+		Divergence_of_Vector(DivEj, Vec, Ej_nei, Ej_m, n_nei, Dim, WeightedLeastSquares);//è°ƒç”¨å…·æœ‰åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹çš„å‡½æ•°
+
+		//3-4-3åˆ†é‡èµ‹å€¼
+		GradT[j] = DivEj;
+	}
+	//3-4-4é‡Šæ”¾ä¸´æ—¶å˜é‡
+	for (int d = 0; d < n_nei; d++)
+		delete[] Ej_nei[d];
+	delete[] Ej_nei;
+	delete[] Ej_m;
+
+}
+
+/***é‡è½½III, ä¸è¢«è°ƒç”¨æ—©æœŸç‰ˆæœ¬. Overload III, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨è¿­ä»£æ³•, éœ€è¦é¢„è®¾ç²¾åº¦. call iterative method to solve matrix equation, need preset tolerance*/
+//3-1-III
+void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, double tolerance)
+{
+	double* dphi = new double[n_nei];//3-1-1è®¾ä¸´æ—¶å˜é‡dphi[]
+	for (int n = 0; n < n_nei; n++)
+		dphi[n] = phi_nei[n] - phi_m;
+	LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim, tolerance);//3-1-2è°ƒç”¨4-3æ±‚è§£æ¢¯åº¦
+	delete[] dphi;//3-1-3é‡Šæ”¾ä¸´æ—¶å˜é‡dphi[]
+
+}
+//3-2-III
+void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, double tolerance)
+{
+	//3-2-1è®¾ä¸´æ—¶å˜é‡Gradphi[] phi_nei[] phi_m
+	double* Gradphi = new double[Dim];//çŸ¢é‡çš„æ¯ä¸ªåˆ†é‡ä½œä¸ºæ ‡é‡æ¥åˆ†åˆ«è®¡ç®—æ¢¯åº¦
+	double* phi_nei = new double[n_nei];
+	double phi_m;
+	//3-2-2è°ƒç”¨3-1è®¡ç®—æ¯ä¸ªåˆ†é‡çš„æ¢¯åº¦
+	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeç¬¬d_attriVä¸ªåˆ†é‡,é€ä¸ªåˆ†é‡è®¡ç®—
+	{
+		for (int n = 0; n < n_nei; n++)//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çœ‹ä½œä¸€ä¸ªæ ‡é‡phi
+		{
+			phi_nei[n] = E_nei[n][d_attriV];
+			phi_m = E_m[d_attriV];
+		}
+		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim, tolerance);//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çš„æ¢¯åº¦
+		for (int dcol = 0; dcol < Dim; dcol++)
+			GradE[d_attriV][dcol] = Gradphi[dcol]; //èµ‹å€¼ç»™å¼ é‡GradE[][]çš„ç¬¬d_attriVè¡Œ
+	}
+	//3-2-3é‡Šæ”¾å±€éƒ¨å˜é‡å†…å­˜
+	delete[] Gradphi;
+	delete[] phi_nei;
+
+}
+//3-3-III
+void Divergence_of_Vector(double &DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, double tolerance)
+{
+	//3-3-1è®¾ä¸´æ—¶å˜é‡GradE[][]
+	double** GradE = new double* [Dim];
+	for (int i = 0; i < Dim; i++)
+		GradE[i] = new double[Dim];
+	//3-3-2è°ƒç”¨3-2è®¡ç®—çŸ¢é‡æ¢¯åº¦GradE
 	Gradient_of_Vector(GradE, Vec, E_nei, E_m, n_nei, Dim, tolerance);
 	//3-3-3trace of GradE=DivE
 	DivE = 0;
@@ -55,17 +174,16 @@ void Divergence_of_Vector(double &DivE, double** Vec, double** E_nei, double* E_
 			if (j == i)
 				DivE = DivE + GradE[i][j];
 		}
-	//3-3-4ÊÍ·ÅÁÙÊ±ÄÚ´æGradE[][]
+	//3-3-4é‡Šæ”¾ä¸´æ—¶å†…å­˜GradE[][]
 	for (int i = 0; i < Dim; i++)
 		delete[] GradE[i];
 	delete[] GradE;
 }
-
-//3-4ÕÅÁ¿µÄÉ¢¶È
+//3-4-III
 void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim, double tolerance)
 {
-	//Ã¿Ò»ÁĞµÄÉ¢¶ÈT=[E0, E1,]
-	//3-4-1ÁÙÊ±±äÁ¿Ej_nei[n_nei][Dim], Ej_m[Dim]
+	//æ¯ä¸€åˆ—çš„æ•£åº¦T=[E0, E1,]
+	//3-4-1ä¸´æ—¶å˜é‡Ej_nei[n_nei][Dim], Ej_m[Dim]
 	double DivEj=0;
 	double** Ej_nei = new double* [n_nei];
 	for (int d = 0; d < n_nei; d++)
@@ -76,17 +194,17 @@ void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double**
 	{
 		for (int d = 0; d < n_nei; d++)
 			for (int i = 0; i < Dim; i++)
-				Ej_nei[d][i] = T_nei[d][i][j];//µÚjÁĞ
+				Ej_nei[d][i] = T_nei[d][i][j];//ç¬¬jåˆ—
 		for (int i = 0; i < Dim; i++)
 			Ej_m[i] = T_m[i][j];
 
-		//3-4-2µ÷ÓÃ3-3ÇóµÚjÁĞµÄÉ¢¶È
+		//3-4-2è°ƒç”¨3-3æ±‚ç¬¬jåˆ—çš„æ•£åº¦
 		Divergence_of_Vector(DivEj,Vec, Ej_nei, Ej_m, n_nei, Dim, tolerance);
 
-		//3-4-3·ÖÁ¿¸³Öµ
+		//3-4-3åˆ†é‡èµ‹å€¼
 		GradT[j] = DivEj;
 	}
-	//3-4-4ÊÍ·ÅÁÙÊ±±äÁ¿
+	//3-4-4é‡Šæ”¾ä¸´æ—¶å˜é‡
 	for (int d = 0; d < n_nei; d++)
 		delete[] Ej_nei[d];
 	delete[] Ej_nei;
@@ -94,51 +212,50 @@ void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double**
 
 }
 
-/*Ò»´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î*/
-//3-1±êÁ¿Ìİ¶È
+/***é‡è½½I,ä¸è¢«è°ƒç”¨æ—©æœŸç‰ˆæœ¬. Overload I, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ— åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹, Dim=2 or 3. call inverse method to solve matrix equation, No weighted least squares option*/
+//3-1-I
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim)
 {
-	double* dphi = new double[n_nei];//3-1-1ÉèÁÙÊ±±äÁ¿dphi[]
+	double* dphi = new double[n_nei];//3-1-1è®¾ä¸´æ—¶å˜é‡dphi[]
 	for (int n = 0; n < n_nei; n++)
 		dphi[n] = phi_nei[n] - phi_m;
-	LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim);//3-1-2µ÷ÓÃ4-3Çó½âÌİ¶È
-	delete[] dphi;//3-1-3ÊÍ·ÅÁÙÊ±±äÁ¿dphi[]
+	LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim);//3-1-2è°ƒç”¨4-3æ±‚è§£æ¢¯åº¦
+	delete[] dphi;//3-1-3é‡Šæ”¾ä¸´æ—¶å˜é‡dphi[]
 
 }
-
-//3-2Ê¸Á¿EµÄÌİ¶È E_nei[n_nei][Dim]
+//3-2-I
 void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim)
 {
-	//3-2-1ÉèÁÙÊ±±äÁ¿Gradphi[] phi_nei[] phi_m
-	double* Gradphi = new double[Dim];//Ê¸Á¿µÄÃ¿¸ö·ÖÁ¿×÷Îª±êÁ¿À´·Ö±ğ¼ÆËãÌİ¶È
+	//3-2-1è®¾ä¸´æ—¶å˜é‡Gradphi[] phi_nei[] phi_m
+	double* Gradphi = new double[Dim];//çŸ¢é‡çš„æ¯ä¸ªåˆ†é‡ä½œä¸ºæ ‡é‡æ¥åˆ†åˆ«è®¡ç®—æ¢¯åº¦
 	double* phi_nei = new double[n_nei];
 	double phi_m;
-	//3-2-2µ÷ÓÃ3-1¼ÆËãÃ¿¸ö·ÖÁ¿µÄÌİ¶È
-	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeµÚd_attriV¸ö·ÖÁ¿,Öğ¸ö·ÖÁ¿¼ÆËã
+	//3-2-2è°ƒç”¨3-1è®¡ç®—æ¯ä¸ªåˆ†é‡çš„æ¢¯åº¦
+	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeç¬¬d_attriVä¸ªåˆ†é‡,é€ä¸ªåˆ†é‡è®¡ç®—
 	{
-		for (int n = 0; n < n_nei; n++)//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿¿´×÷Ò»¸ö±êÁ¿phi
+		for (int n = 0; n < n_nei; n++)//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çœ‹ä½œä¸€ä¸ªæ ‡é‡phi
 		{
 			phi_nei[n] = E_nei[n][d_attriV];
 			phi_m = E_m[d_attriV];
 		}
-		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim);//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿µÄÌİ¶È
+		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim);//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çš„æ¢¯åº¦
 		for (int dcol = 0; dcol < Dim; dcol++)
-			GradE[d_attriV][dcol] = Gradphi[dcol]; //¸³Öµ¸øÕÅÁ¿GradE[][]µÄµÚd_attriVĞĞ
+			GradE[d_attriV][dcol] = Gradphi[dcol]; //èµ‹å€¼ç»™å¼ é‡GradE[][]çš„ç¬¬d_attriVè¡Œ
 	}
-	//3-2-3ÊÍ·Å¾Ö²¿±äÁ¿ÄÚ´æ
+	//3-2-3é‡Šæ”¾å±€éƒ¨å˜é‡å†…å­˜
 	delete[] Gradphi;
 	delete[] phi_nei;
 
 }
-
-//3-3Ê¸Á¿EµÄÉ¢¶È
+//3-3-I
 void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim)
 {
-	//3-3-1ÉèÁÙÊ±±äÁ¿GradE[][]
+	//3-3-1è®¾ä¸´æ—¶å˜é‡GradE[][]
 	double** GradE = new double* [Dim];
 	for (int i = 0; i < Dim; i++)
 		GradE[i] = new double[Dim];
-	//3-3-2µ÷ÓÃ3-2¼ÆËãÊ¸Á¿Ìİ¶ÈGradE
+	//3-3-2è°ƒç”¨3-2è®¡ç®—çŸ¢é‡æ¢¯åº¦GradE
 	Gradient_of_Vector(GradE, Vec, E_nei, E_m, n_nei, Dim);
 	//3-3-3trace of GradE=DivE
 	DivE = 0;
@@ -148,17 +265,16 @@ void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_
 			if (j == i)
 				DivE = DivE + GradE[i][j];
 		}
-	//3-3-4ÊÍ·ÅÁÙÊ±ÄÚ´æGradE[][]
+	//3-3-4é‡Šæ”¾ä¸´æ—¶å†…å­˜GradE[][]
 	for (int i = 0; i < Dim; i++)
 		delete[] GradE[i];
 	delete[] GradE;
 }
-
-//3-4ÕÅÁ¿µÄÉ¢¶È
+//3-4-I
 void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim)
 {
-	//Ã¿Ò»ÁĞµÄÉ¢¶ÈT=[E0, E1,]
-	//3-4-1ÁÙÊ±±äÁ¿Ej_nei[n_nei][Dim], Ej_m[Dim]
+	//æ¯ä¸€åˆ—çš„æ•£åº¦T=[E0, E1,]
+	//3-4-1ä¸´æ—¶å˜é‡Ej_nei[n_nei][Dim], Ej_m[Dim]
 	double DivEj = 0;
 	double** Ej_nei = new double* [n_nei];
 	for (int d = 0; d < n_nei; d++)
@@ -169,17 +285,17 @@ void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double**
 	{
 		for (int d = 0; d < n_nei; d++)
 			for (int i = 0; i < Dim; i++)
-				Ej_nei[d][i] = T_nei[d][i][j];//µÚjÁĞ
+				Ej_nei[d][i] = T_nei[d][i][j];//ç¬¬jåˆ—
 		for (int i = 0; i < Dim; i++)
 			Ej_m[i] = T_m[i][j];
 
-		//3-4-2µ÷ÓÃ3-3ÇóµÚjÁĞµÄÉ¢¶È
+		//3-4-2è°ƒç”¨3-3æ±‚ç¬¬jåˆ—çš„æ•£åº¦
 		Divergence_of_Vector(DivEj, Vec, Ej_nei, Ej_m, n_nei, Dim);
 
-		//3-4-3·ÖÁ¿¸³Öµ
+		//3-4-3åˆ†é‡èµ‹å€¼
 		GradT[j] = DivEj;
 	}
-	//3-4-4ÊÍ·ÅÁÙÊ±±äÁ¿
+	//3-4-4é‡Šæ”¾ä¸´æ—¶å˜é‡
 	for (int d = 0; d < n_nei; d++)
 		delete[] Ej_nei[d];
 	delete[] Ej_nei;
@@ -187,14 +303,16 @@ void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double**
 
 }
 
-/*¶ş´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î£¬Ô¤´æVTVµÄÄæ*/
-//3-1ÏëÇómarker mµÄÊôĞÔ±êÁ¿phiµÄÌİ¶È, ·µ»ØÌİ¶ÈGradphi[]£¬µ¼Êı¾ØÕóÎªVec[][]£¬ÁÙ½üµãÊôĞÔphi_nei[]£¬ËùÇó½ÚµãÊôĞÔphi_m£¬ÁÙ½üµãÊın_nei£¬Î¬¶ÈDim£¬
+/***é‡è½½II,å·²ä¸è¢«è°ƒç”¨çš„æ—©æœŸç‰ˆæœ¬. Overload II, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ— åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹,Dim=2 or 3.  éœ€è¦Inverse_VecTVec[Dim][Dim]
+call inverse method to solve matrix equation, No weighted least squares option, need Inverse_VecTVec[Dim][Dim]*/
+//3-1-II
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double** Inverse_VecTVec, double* phi_nei, double phi_m, int n_nei, int Dim)
 {
-	double* dphi = new double[n_nei];//3-1-1ÉèÁÙÊ±±äÁ¿dphi[]
+	double* dphi = new double[n_nei];//3-1-1è®¾ä¸´æ—¶å˜é‡dphi[]
 	for (int n = 0; n < n_nei; n++)
 		dphi[n] = phi_nei[n] - phi_m;
-	double* VecTdphi = new double[Dim];//3-1-1ÉèÁÙÊ±±äÁ¿VecTdphi[]
+	double* VecTdphi = new double[Dim];//3-1-1è®¾ä¸´æ—¶å˜é‡VecTdphi[]
 	//VecTdphi[Dim]=Vec[n_nei][Dim]*dphi[n_nei]
 	for (int j = 0; j < Dim; j++)
 	{
@@ -202,46 +320,44 @@ void Gradient_of_Scalar(double* Gradphi, double** Vec, double** Inverse_VecTVec,
 		for (int i = 0; i < n_nei; i++)
 			VecTdphi[j] = VecTdphi[j] + dphi[i] * Vec[i][j];			
 	}
-	Matrix_Vector_Multiplier(Gradphi, Inverse_VecTVec, VecTdphi, Dim, Dim);//3-1-2µ÷ÓÃº¯Êı
+	Matrix_Vector_Multiplier(Gradphi, Inverse_VecTVec, VecTdphi, Dim, Dim);//3-1-2è°ƒç”¨å‡½æ•°
 
-	delete[] dphi;//3-1-3ÊÍ·ÅÁÙÊ±±äÁ¿dphi[]
-	delete[] VecTdphi;//3-1-3ÊÍ·ÅÁÙÊ±±äÁ¿VecTdphi[]
+	delete[] dphi;//3-1-3é‡Šæ”¾ä¸´æ—¶å˜é‡dphi[]
+	delete[] VecTdphi;//3-1-3é‡Šæ”¾ä¸´æ—¶å˜é‡VecTdphi[]
 
 }
-
-//3-2Ê¸Á¿EµÄÌİ¶È E_nei[n_nei][Dim]
+//3-2-II
 void Gradient_of_Vector(double** GradE, double** Vec, double** Inverse_VecTVec, double** E_nei, double* E_m, int n_nei, int Dim)
 {
-	//3-2-1ÉèÁÙÊ±±äÁ¿Gradphi[] phi_nei[] phi_m
-	double* Gradphi = new double[Dim];//Ê¸Á¿µÄÃ¿¸ö·ÖÁ¿×÷Îª±êÁ¿À´·Ö±ğ¼ÆËãÌİ¶È
+	//3-2-1è®¾ä¸´æ—¶å˜é‡Gradphi[] phi_nei[] phi_m
+	double* Gradphi = new double[Dim];//çŸ¢é‡çš„æ¯ä¸ªåˆ†é‡ä½œä¸ºæ ‡é‡æ¥åˆ†åˆ«è®¡ç®—æ¢¯åº¦
 	double* phi_nei = new double[n_nei];
 	double phi_m;
-	//3-2-2µ÷ÓÃ3-1¼ÆËãÃ¿¸ö·ÖÁ¿µÄÌİ¶È
-	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeµÚd_attriV¸ö·ÖÁ¿,Öğ¸ö·ÖÁ¿¼ÆËã
+	//3-2-2è°ƒç”¨3-1è®¡ç®—æ¯ä¸ªåˆ†é‡çš„æ¢¯åº¦
+	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeç¬¬d_attriVä¸ªåˆ†é‡,é€ä¸ªåˆ†é‡è®¡ç®—
 	{
-		for (int n = 0; n < n_nei; n++)//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿¿´×÷Ò»¸ö±êÁ¿phi
+		for (int n = 0; n < n_nei; n++)//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çœ‹ä½œä¸€ä¸ªæ ‡é‡phi
 		{
 			phi_nei[n] = E_nei[n][d_attriV];
 			phi_m = E_m[d_attriV];
 		}
-		Gradient_of_Scalar(Gradphi, Vec, Inverse_VecTVec, phi_nei, phi_m, n_nei, Dim);//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿µÄÌİ¶È
+		Gradient_of_Scalar(Gradphi, Vec, Inverse_VecTVec, phi_nei, phi_m, n_nei, Dim);//Vectorå˜é‡çš„ç¬¬d_attriVä¸ªåˆ†é‡çš„æ¢¯åº¦
 		for (int dcol = 0; dcol < Dim; dcol++)
-			GradE[d_attriV][dcol] = Gradphi[dcol]; //¸³Öµ¸øÕÅÁ¿GradE[][]µÄµÚd_attriVĞĞ
+			GradE[d_attriV][dcol] = Gradphi[dcol]; //èµ‹å€¼ç»™å¼ é‡GradE[][]çš„ç¬¬d_attriVè¡Œ
 	}
-	//3-2-3ÊÍ·Å¾Ö²¿±äÁ¿ÄÚ´æ
+	//3-2-3é‡Šæ”¾å±€éƒ¨å˜é‡å†…å­˜
 	delete[] Gradphi;
 	delete[] phi_nei;
 
 }
-
-//3-3Ê¸Á¿EµÄÉ¢¶È
+//3-3-II
 void Divergence_of_Vector(double& DivE, double** Vec, double** Inverse_VecTVec, double** E_nei, double* E_m, int n_nei, int Dim)
 {
-	//3-3-1ÉèÁÙÊ±±äÁ¿GradE[][]
+	//3-3-1è®¾ä¸´æ—¶å˜é‡GradE[][]
 	double** GradE = new double* [Dim];
 	for (int i = 0; i < Dim; i++)
 		GradE[i] = new double[Dim];
-	//3-3-2µ÷ÓÃ3-2¼ÆËãÊ¸Á¿Ìİ¶ÈGradE
+	//3-3-2è°ƒç”¨3-2è®¡ç®—çŸ¢é‡æ¢¯åº¦GradE
 	Gradient_of_Vector(GradE, Vec, Inverse_VecTVec, E_nei, E_m, n_nei, Dim);
 	//3-3-3trace of GradE=DivE
 	DivE = 0;
@@ -251,17 +367,16 @@ void Divergence_of_Vector(double& DivE, double** Vec, double** Inverse_VecTVec, 
 			if (j == i)
 				DivE = DivE + GradE[i][j];
 		}
-	//3-3-4ÊÍ·ÅÁÙÊ±ÄÚ´æGradE[][]
+	//3-3-4é‡Šæ”¾ä¸´æ—¶å†…å­˜GradE[][]
 	for (int i = 0; i < Dim; i++)
 		delete[] GradE[i];
 	delete[] GradE;
 }
-
-//3-4ÕÅÁ¿µÄÉ¢¶È
+//3-4-II
 void Divergence_of_Tensor(double* GradT, double** Vec, double** Inverse_VecTVec, double*** T_nei, double** T_m, int n_nei, int Dim)
 {
-	//Ã¿Ò»ÁĞµÄÉ¢¶ÈT=[E0, E1,]
-	//3-4-1ÁÙÊ±±äÁ¿Ej_nei[n_nei][Dim], Ej_m[Dim]
+	//æ¯ä¸€åˆ—çš„æ•£åº¦T=[E0, E1,]
+	//3-4-1ä¸´æ—¶å˜é‡Ej_nei[n_nei][Dim], Ej_m[Dim]
 	double DivEj = 0;
 	double** Ej_nei = new double* [n_nei];
 	for (int d = 0; d < n_nei; d++)
@@ -272,135 +387,21 @@ void Divergence_of_Tensor(double* GradT, double** Vec, double** Inverse_VecTVec,
 	{
 		for (int d = 0; d < n_nei; d++)
 			for (int i = 0; i < Dim; i++)
-				Ej_nei[d][i] = T_nei[d][i][j];//µÚjÁĞ
+				Ej_nei[d][i] = T_nei[d][i][j];//ç¬¬jåˆ—
 		for (int i = 0; i < Dim; i++)
 			Ej_m[i] = T_m[i][j];
 
-		//3-4-2µ÷ÓÃ3-3ÇóµÚjÁĞµÄÉ¢¶È
+		//3-4-2è°ƒç”¨3-3æ±‚ç¬¬jåˆ—çš„æ•£åº¦
 		Divergence_of_Vector(DivEj, Vec, Inverse_VecTVec, Ej_nei, Ej_m, n_nei, Dim);
 
-		//3-4-3·ÖÁ¿¸³Öµ
+		//3-4-3åˆ†é‡èµ‹å€¼
 		GradT[j] = DivEj;
 	}
-	//3-4-4ÊÍ·ÅÁÙÊ±±äÁ¿
+	//3-4-4é‡Šæ”¾ä¸´æ—¶å˜é‡
 	for (int d = 0; d < n_nei; d++)
 		delete[] Ej_nei[d];
 	delete[] Ej_nei;
 	delete[] Ej_m;
 
-}
-
-/*Ò»-2´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î-Ôö¼Ó¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî*/
-//3-1±êÁ¿Ìİ¶È
-void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, bool WeightedLeastSquares)
-{
-	double* dphi = new double[n_nei];//3-1-1ÉèÁÙÊ±±äÁ¿dphi[]
-	for (int n = 0; n < n_nei; n++)
-		dphi[n] = phi_nei[n] - phi_m;
-	if (WeightedLeastSquares == 1)//Èç¹û²ÉÓÃ¼ÓÈ¨×îĞ¡¶ş³Ë¹¹Ôì
-	{
-		//×¼±¸¼ÓÈ¨µÄµ¼Êı¾ØÕóºÍ¼ÓÈ¨µÄ³£ÊıÏòÁ¿
-		double** WeightVec = new double* [n_nei];
-		for (int n = 0; n < n_nei; n++)
-			WeightVec[n] = new double[Dim];//²ÉÓÃ¼ÓÈ¨µÄµ¼Êı¾ØÕó-¾Ö²¿±äÁ¿
-		double DistanceSquare_CenterNeighbor;//ÁÙÊ±µÄ¾Ö²¿±äÁ¿ÖĞĞÄµãµ¼ÁÙ½üµã
-		for (int n = 0; n < n_nei; n++)
-		{
-			DistanceSquare_CenterNeighbor=0;
-			for (int i = 0; i < Dim; i++)
-				DistanceSquare_CenterNeighbor += Vec[n][i] * Vec[n][i];//¼ÆËãµÚn¸öNeighborµÄ¾àÀëÆ½·½
-			dphi[n] = dphi[n] / DistanceSquare_CenterNeighbor;//¼ÓÈ¨µÄµ¼Êı¾ØÕó
-			for (int i = 0; i < Dim; i++)
-				WeightVec[n][i] = Vec[n][i] /DistanceSquare_CenterNeighbor;//¼ÓÈ¨µÄ³£ÊıÏòÁ¿
-		}
-		LeastSquareSolution(Gradphi,WeightVec,dphi,n_nei,Dim);
-		for (int n = 0; n < n_nei; n++)//ÊÍ·Å¼ÓÈ¨µÄµ¼Êı¾ØÕó
-			delete[] WeightVec[n];
-		delete[] WeightVec;
-	}
-	else
-		LeastSquareSolution(Gradphi, Vec, dphi, n_nei, Dim);//3-1-2µ÷ÓÃ4-3Çó½âÌİ¶È//²»²ÉÓÃ¼ÓÈ¨×îĞ¡¶ş³Ë¹¹Ôì
-	delete[] dphi;//3-1-3ÊÍ·ÅÁÙÊ±±äÁ¿dphi[]
-
-}
-
-//3-2Ê¸Á¿EµÄÌİ¶È E_nei[n_nei][Dim]
-void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares)
-{
-	//3-2-1ÉèÁÙÊ±±äÁ¿Gradphi[] phi_nei[] phi_m
-	double* Gradphi = new double[Dim];//Ê¸Á¿µÄÃ¿¸ö·ÖÁ¿×÷Îª±êÁ¿À´·Ö±ğ¼ÆËãÌİ¶È
-	double* phi_nei = new double[n_nei];
-	double phi_m;
-	//3-2-2µ÷ÓÃ3-1¼ÆËãÃ¿¸ö·ÖÁ¿µÄÌİ¶È
-	for (int d_attriV = 0; d_attriV < Dim; d_attriV++)//Vector attributeµÚd_attriV¸ö·ÖÁ¿,Öğ¸ö·ÖÁ¿¼ÆËã
-	{
-		for (int n = 0; n < n_nei; n++)//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿¿´×÷Ò»¸ö±êÁ¿phi
-		{
-			phi_nei[n] = E_nei[n][d_attriV];
-			phi_m = E_m[d_attriV];
-		}
-		Gradient_of_Scalar(Gradphi, Vec, phi_nei, phi_m, n_nei, Dim, WeightedLeastSquares);//Vector±äÁ¿µÄµÚd_attriV¸ö·ÖÁ¿µÄÌİ¶È,µ÷ÓÃ¾ßÓĞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡ÏîµÄº¯Êı
-		for (int dcol = 0; dcol < Dim; dcol++)
-			GradE[d_attriV][dcol] = Gradphi[dcol]; //¸³Öµ¸øÕÅÁ¿GradE[][]µÄµÚd_attriVĞĞ
-	}
-	//3-2-3ÊÍ·Å¾Ö²¿±äÁ¿ÄÚ´æ
-	delete[] Gradphi;
-	delete[] phi_nei;
-
-}
-
-//3-3Ê¸Á¿EµÄÉ¢¶È
-void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares)
-{
-	//3-3-1ÉèÁÙÊ±±äÁ¿GradE[][]
-	double** GradE = new double* [Dim];
-	for (int i = 0; i < Dim; i++)
-		GradE[i] = new double[Dim];
-	//3-3-2µ÷ÓÃ3-2¼ÆËãÊ¸Á¿Ìİ¶ÈGradE
-	Gradient_of_Vector(GradE, Vec, E_nei, E_m, n_nei, Dim, WeightedLeastSquares);//µ÷ÓÃ¾ßÓĞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡ÏîµÄº¯Êı
-	//3-3-3trace of GradE=DivE
-	DivE = 0;
-	for (int i = 0; i < Dim; i++)
-		for (int j = 0; j < Dim; j++)
-		{
-			if (j == i)
-				DivE = DivE + GradE[i][j];
-		}
-	//3-3-4ÊÍ·ÅÁÙÊ±ÄÚ´æGradE[][]
-	for (int i = 0; i < Dim; i++)
-		delete[] GradE[i];
-	delete[] GradE;
-}
-
-//3-4ÕÅÁ¿µÄÉ¢¶È
-void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim, bool WeightedLeastSquares)
-{
-	//Ã¿Ò»ÁĞµÄÉ¢¶ÈT=[E0, E1,]
-	//3-4-1ÁÙÊ±±äÁ¿Ej_nei[n_nei][Dim], Ej_m[Dim]
-	double DivEj = 0;
-	double** Ej_nei = new double* [n_nei];
-	for (int d = 0; d < n_nei; d++)
-		Ej_nei[d] = new double[Dim];
-	double* Ej_m = new double[Dim];
-
-	for (int j = 0; j < Dim; j++)
-	{
-		for (int d = 0; d < n_nei; d++)
-			for (int i = 0; i < Dim; i++)
-				Ej_nei[d][i] = T_nei[d][i][j];//µÚjÁĞ
-		for (int i = 0; i < Dim; i++)
-			Ej_m[i] = T_m[i][j];
-
-		//3-4-2µ÷ÓÃ3-3ÇóµÚjÁĞµÄÉ¢¶È
-		Divergence_of_Vector(DivEj, Vec, Ej_nei, Ej_m, n_nei, Dim, WeightedLeastSquares);//µ÷ÓÃ¾ßÓĞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡ÏîµÄº¯Êı
-
-		//3-4-3·ÖÁ¿¸³Öµ
-		GradT[j] = DivEj;
-	}
-	//3-4-4ÊÍ·ÅÁÙÊ±±äÁ¿
-	for (int d = 0; d < n_nei; d++)
-		delete[] Ej_nei[d];
-	delete[] Ej_nei;
-	delete[] Ej_m;
 
 }

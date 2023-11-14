@@ -1,35 +1,35 @@
 #include "MathLayer.h"
 #include  <iostream>
 #include <cmath>
-using namespace std;
+using namespace std;//functions definitions, functions in header "MathLayer.h"
 
-//Guass-Seidelµü´ú·¨ÇóÏßĞÔ´úÊı·½³Ì×é,ÏµÊı¾ØÕóÎª·½Õó
+//4-2Guass-Seidelè¿­ä»£æ±‚è§£å™¨å‡½æ•°å®šä¹‰. Guass-Seidel iterative method solver, function definition.
 void Guass_Seidel_Slover(double* x,double** A, double* b, int n, double tolerance)
 {
-	/******Step1 ÉèÖÃ½âµÄµü´ú³õÖµ-ÓÃ»§ÒÑ¸ø******/
+	/******Step1 è®¾ç½®è§£çš„è¿­ä»£åˆå€¼-ç”¨æˆ·å·²ç»™******/
 	for (int i = 0; i < n; i++)
 	{
 		x[i] = 0;
 	}
 
-	/******Step2 ÉèÖÃº¯ÊıÌåĞèÒªµÄ¾Ö²¿±äÁ¿******/
-	double* x0 = new double[n];//½øĞĞµü´úÖ®Ç°£¬°Ñµ±Ç°µÄ¸ù´æÆğÀ´£¬ÇóÎó²î·¶ÊıÓÃ
-	double tol;//Îó²î·¶Êı
-	int it_sm = 0;//µü´ú¼Æ´ÎÆ÷
+	/******Step2 è®¾ç½®å‡½æ•°ä½“éœ€è¦çš„å±€éƒ¨å˜é‡******/
+	double* x0 = new double[n];//è¿›è¡Œè¿­ä»£ä¹‹å‰ï¼ŒæŠŠå½“å‰çš„æ ¹å­˜èµ·æ¥ï¼Œæ±‚è¯¯å·®èŒƒæ•°ç”¨
+	double tol;//è¯¯å·®èŒƒæ•°
+	int it_sm = 0;//è¿­ä»£è®¡æ¬¡å™¨
 
-	//Èç¹û³¤Ê±¼ä²»ÊÕÁ²£¬breakÒ»ÏÂ
-	//cout << "Äúµ÷ÓÃÁËGusas-Seidelµü´ú·¨Çó½âÆ÷"  << endl;
+	//å¦‚æœé•¿æ—¶é—´ä¸æ”¶æ•›ï¼Œbreakä¸€ä¸‹
+	//cout << "æ‚¨è°ƒç”¨äº†Gusas-Seidelè¿­ä»£æ³•æ±‚è§£å™¨"  << endl;
 
-	/******Step3 ¿ªÊ¼µü´ú******/
+	/******Step3 å¼€å§‹è¿­ä»£******/
 	do
 	{
-		//´æÒ»ÏÂµÚit²½µÄ½â
+		//å­˜ä¸€ä¸‹ç¬¬itæ­¥çš„è§£
 		for (int k = 0; k < n; k++)
 		{
 			x0[k] = x[k];
 		}
 
-		//¿ªÊ¼µÚit²½µÄµü´ú
+		//å¼€å§‹ç¬¬itæ­¥çš„è¿­ä»£
 		for (int i = 0; i < n; i++)
 		{
 			x[i] = b[i] / A[i][i];
@@ -41,12 +41,12 @@ void Guass_Seidel_Slover(double* x,double** A, double* b, int n, double toleranc
 			}
 
 		}
-		//µÚit´Îµü´úÍê³É
+		//ç¬¬itæ¬¡è¿­ä»£å®Œæˆ
 
-		/******Step4 ¼ÆËãµü´úÎó²î******/
-		//¼ÆËãÎó²î·¶Êıtol=||x-x0||max·¶Êı£¬ËùÓĞ·ÖÁ¿µÄ¾ø¶ÔÖµ±ØĞëĞ¡ÓÚÈİÈÌ¹«²î
-		tol = x[0] - x0[0];//µÚ0·ÖÁ¿Îó²î
-		tol = abs(tol);//È¡¾ø¶ÔÖµ
+		/******Step4 è®¡ç®—è¿­ä»£è¯¯å·®******/
+		//è®¡ç®—è¯¯å·®èŒƒæ•°tol=||x-x0||maxèŒƒæ•°ï¼Œæ‰€æœ‰åˆ†é‡çš„ç»å¯¹å€¼å¿…é¡»å°äºå®¹å¿å…¬å·®
+		tol = x[0] - x0[0];//ç¬¬0åˆ†é‡è¯¯å·®
+		tol = abs(tol);//å–ç»å¯¹å€¼
 		for (int m = 1; m < n; m++)
 		{
 			double temp_tol = x[m] - x0[m];
@@ -57,48 +57,48 @@ void Guass_Seidel_Slover(double* x,double** A, double* b, int n, double toleranc
 			}
 		}
 
-		it_sm = it_sm + 1;//µü´ú¼Æ´ÎÆ÷+1
+		it_sm = it_sm + 1;//è¿­ä»£è®¡æ¬¡å™¨+1
 
-		/******Step5 Êä³ö¼ÆËãlogÈÕÖ¾itÓëtol******/
+		/******Step5 è¾“å‡ºè®¡ç®—logæ—¥å¿—itä¸tol******/
 		//cout << "it=" <<it_sm << "  " << "tol=" << tol <<endl;
 
 	} while (tol > tolerance);
 
-	//cout << "it=" << it_sm << "  ÊÕÁ²" << endl;//Í¬ÎªÈÕÖ¾ÎÄ¼şÊä³ö
+	//cout << "it=" << it_sm << "  æ”¶æ•›" << endl;//åŒä¸ºæ—¥å¿—æ–‡ä»¶è¾“å‡º
 
-	/******Step6 ÊÍ·Å¾Ö²¿µÄ¶¯Ì¬Êı×éÄÚ´æ******/
-	delete [] x0;//ÊÍ·Å¶¯Ì¬Êı×é
+	/******Step6 é‡Šæ”¾å±€éƒ¨çš„åŠ¨æ€æ•°ç»„å†…å­˜******/
+	delete [] x0;//é‡Šæ”¾åŠ¨æ€æ•°ç»„
 
 }
 
-//Guass-Seidelµü´ú·¨ÇóÏßĞÔ´úÊı·½³Ì×é-È±Ê¡Ô¤Éè¾«¶ÈÖØÔØº¯Êı£¬µü´úÊä³öÓï¾äºóÆÚÉ¾³ı
+//4-2-2é‡æ„ä¸€ä¸‹toleranceç¼ºçœå€¼ä¸º1e-7.æµ‹è¯•ç‰ˆæœ‰è¾“å‡ºè¯­å¥. overload of 4-2,  default tolerance=1e-7, Test version, include output
 void Guass_Seidel_Slover(double* x, double** A, double* b, int n)
 {
-	/******Step1 ÉèÖÃ½âµÄµü´ú³õÖµ-ÓÃ»§ÒÑ¸ø******/
+	/******Step1 è®¾ç½®è§£çš„è¿­ä»£åˆå€¼-ç”¨æˆ·å·²ç»™******/
 	for (int i = 0; i < n; i++)
 	{
 		x[i] = 0;
 	}
 
-	/******Step2 ÉèÖÃº¯ÊıÌåĞèÒªµÄ¾Ö²¿±äÁ¿******/
+	/******Step2 è®¾ç½®å‡½æ•°ä½“éœ€è¦çš„å±€éƒ¨å˜é‡******/
 	double tolerance=1e-7;//
-	double* x0 = new double[n];//½øĞĞµü´úÖ®Ç°£¬°Ñµ±Ç°µÄ¸ù´æÆğÀ´£¬ÇóÎó²î·¶ÊıÓÃ
-	double tol;//Îó²î·¶Êı
-	int it = 0;//µü´ú¼Æ´ÎÆ÷
-	cout << "Äúµ÷ÓÃÊ±Ã»ÓĞÔ¤Éè¾«¶ÈÒªÇó£¬Ä¬ÈÏÔ¤Éè¾«¶Ètolerance=" << tolerance << endl;
+	double* x0 = new double[n];//è¿›è¡Œè¿­ä»£ä¹‹å‰ï¼ŒæŠŠå½“å‰çš„æ ¹å­˜èµ·æ¥ï¼Œæ±‚è¯¯å·®èŒƒæ•°ç”¨
+	double tol;//è¯¯å·®èŒƒæ•°
+	int it = 0;//è¿­ä»£è®¡æ¬¡å™¨
+	cout << "æ‚¨è°ƒç”¨æ—¶æ²¡æœ‰é¢„è®¾ç²¾åº¦è¦æ±‚ï¼Œé»˜è®¤é¢„è®¾ç²¾åº¦tolerance=" << tolerance << endl;
 
-	//Èç¹û³¤Ê±¼ä²»ÊÕÁ²£¬breakÒ»ÏÂ£¬ËãÁËÏÈ²»¼Ó´Ë¹¦ÄÜÁË¡£ÕâÖ»ÊÇÒ»¸öº¯Êı
+	//å¦‚æœé•¿æ—¶é—´ä¸æ”¶æ•›ï¼Œbreakä¸€ä¸‹ï¼Œç®—äº†å…ˆä¸åŠ æ­¤åŠŸèƒ½äº†ã€‚è¿™åªæ˜¯ä¸€ä¸ªå‡½æ•°
 
-	/******Step3 ¿ªÊ¼µü´ú******/
+	/******Step3 å¼€å§‹è¿­ä»£******/
 	do
 	{
-		//´æÒ»ÏÂµÚit²½µÄ½â
+		//å­˜ä¸€ä¸‹ç¬¬itæ­¥çš„è§£
 		for (int k = 0; k < n; k++)
 		{
 			x0[k] = x[k];
 		}
 
-		//¿ªÊ¼µÚit²½µÄµü´ú
+		//å¼€å§‹ç¬¬itæ­¥çš„è¿­ä»£
 		for (int i = 0; i < n; i++)
 		{
 			x[i] = b[i] / A[i][i];
@@ -110,12 +110,12 @@ void Guass_Seidel_Slover(double* x, double** A, double* b, int n)
 			}
 
 		}
-		//µÚit´Îµü´úÍê³É
+		//ç¬¬itæ¬¡è¿­ä»£å®Œæˆ
 
-		/******Step4 ¼ÆËãµü´úÎó²î******/
-		//¼ÆËãÎó²î·¶Êıtol=||x-x0||1·¶Êı£¬ËùÓĞ·ÖÁ¿µÄ¾ø¶ÔÖµ±ØĞëĞ¡ÓÚÈİÈÌ¹«²î
-		tol = x[0] - x0[0];//µÚ0·ÖÁ¿Îó²î
-		tol = abs(tol);//È¡¾ø¶ÔÖµ
+		/******Step4 è®¡ç®—è¿­ä»£è¯¯å·®******/
+		//è®¡ç®—è¯¯å·®èŒƒæ•°tol=||x-x0||1èŒƒæ•°ï¼Œæ‰€æœ‰åˆ†é‡çš„ç»å¯¹å€¼å¿…é¡»å°äºå®¹å¿å…¬å·®
+		tol = x[0] - x0[0];//ç¬¬0åˆ†é‡è¯¯å·®
+		tol = abs(tol);//å–ç»å¯¹å€¼
 		for (int m = 1; m < n; m++)
 		{
 			double temp_tol = x[m] - x0[m];
@@ -126,47 +126,47 @@ void Guass_Seidel_Slover(double* x, double** A, double* b, int n)
 			}
 		}
 
-		it = it + 1;//µü´ú¼Æ´ÎÆ÷+1
+		it = it + 1;//è¿­ä»£è®¡æ¬¡å™¨+1
 
-		/******Step5 Êä³ö¼ÆËãlogÈÕÖ¾itÓëtol******/
+		/******Step5 è¾“å‡ºè®¡ç®—logæ—¥å¿—itä¸tol******/
 		cout << "it=" << it << "  " << "tol=" << tol << endl;
 
 	} while (tol > tolerance);
 
-	cout << "it=" << it << "  ÊÕÁ²" << endl;//Í¬ÎªÈÕÖ¾ÎÄ¼şÊä³ö
+	cout << "it=" << it << "  æ”¶æ•›" << endl;//åŒä¸ºæ—¥å¿—æ–‡ä»¶è¾“å‡º
 
-	/******Step6 ÊÍ·Å¾Ö²¿µÄ¶¯Ì¬Êı×éÄÚ´æ******/
-	delete[] x0;//ÊÍ·Å¶¯Ì¬Êı×é
+	/******Step6 é‡Šæ”¾å±€éƒ¨çš„åŠ¨æ€æ•°ç»„å†…å­˜******/
+	delete[] x0;//é‡Šæ”¾åŠ¨æ€æ•°ç»„
 
 }
 
-//Jacobiµü´ú·¨ÇóÏßĞÔ´úÊı·½³Ì×é
+//4-1Jacobiè¿­ä»£æ³•æ±‚è§£å™¨å®šä¹‰. Jacobi iterative method solver, function definition.
 void Jacobi_Solver(double* x, double** A, double* b, int n, double tolerance)
 {
-	/******Step1 ÉèÖÃ½âµÄµü´ú³õÖµ******/
+	/******Step1 è®¾ç½®è§£çš„è¿­ä»£åˆå€¼******/
 	for (int i = 0; i < n; i++)
 	{
 		x[i] = 0;
 	}
 
-	/******Step2 ÉèÖÃº¯ÊıÌåĞèÒªµÄ¾Ö²¿±äÁ¿******/
-	double* x0 = new double[n];//½øĞĞµü´úÖ®Ç°£¬°Ñµ±Ç°µÄ¸ù´æÆğÀ´£¬ÇóÎó²î·¶ÊıÓÃ
-	double tol;//Îó²î·¶Êı
-	int it = 0;//µü´ú¼Æ´ÎÆ÷
+	/******Step2 è®¾ç½®å‡½æ•°ä½“éœ€è¦çš„å±€éƒ¨å˜é‡******/
+	double* x0 = new double[n];//è¿›è¡Œè¿­ä»£ä¹‹å‰ï¼ŒæŠŠå½“å‰çš„æ ¹å­˜èµ·æ¥ï¼Œæ±‚è¯¯å·®èŒƒæ•°ç”¨
+	double tol;//è¯¯å·®èŒƒæ•°
+	int it = 0;//è¿­ä»£è®¡æ¬¡å™¨
 
-	//Èç¹û³¤Ê±¼ä²»ÊÕÁ²£¬breakÒ»ÏÂ
-	cout << "Äúµ÷ÓÃÁËJacobiµü´ú·¨Çó½âÆ÷" << endl;
+	//å¦‚æœé•¿æ—¶é—´ä¸æ”¶æ•›ï¼Œbreakä¸€ä¸‹
+	cout << "æ‚¨è°ƒç”¨äº†Jacobiè¿­ä»£æ³•æ±‚è§£å™¨" << endl;
 
-	/******Step3 ¿ªÊ¼µü´ú******/
+	/******Step3 å¼€å§‹è¿­ä»£******/
 	do
 	{
-		//´æÒ»ÏÂµÚit²½µÄ½â
+		//å­˜ä¸€ä¸‹ç¬¬itæ­¥çš„è§£
 		for (int k = 0; k < n; k++)
 		{
 			x0[k] = x[k];
 		}
 
-		//¿ªÊ¼µÚit²½µÄµü´ú
+		//å¼€å§‹ç¬¬itæ­¥çš„è¿­ä»£
 		for (int i = 0; i < n; i++)
 		{
 			x[i] = b[i] / A[i][i];
@@ -178,12 +178,12 @@ void Jacobi_Solver(double* x, double** A, double* b, int n, double tolerance)
 			}
 
 		}
-		//µÚit´Îµü´úÍê³É
+		//ç¬¬itæ¬¡è¿­ä»£å®Œæˆ
 
-		/******Step4 ¼ÆËãµü´úÎó²î******/
-		//¼ÆËãÎó²î·¶Êıtol=||x-x0||max·¶Êı£¬ËùÓĞ·ÖÁ¿µÄ¾ø¶ÔÖµ±ØĞëĞ¡ÓÚÈİÈÌ¹«²î
-		tol = x[0] - x0[0];//µÚ0·ÖÁ¿Îó²î
-		tol = abs(tol);//È¡¾ø¶ÔÖµ
+		/******Step4 è®¡ç®—è¿­ä»£è¯¯å·®******/
+		//è®¡ç®—è¯¯å·®èŒƒæ•°tol=||x-x0||maxèŒƒæ•°ï¼Œæ‰€æœ‰åˆ†é‡çš„ç»å¯¹å€¼å¿…é¡»å°äºå®¹å¿å…¬å·®
+		tol = x[0] - x0[0];//ç¬¬0åˆ†é‡è¯¯å·®
+		tol = abs(tol);//å–ç»å¯¹å€¼
 		for (int m = 1; m < n; m++)
 		{
 			double temp_tol = x[m] - x0[m];
@@ -194,24 +194,24 @@ void Jacobi_Solver(double* x, double** A, double* b, int n, double tolerance)
 			}
 		}
 
-		it = it + 1;//µü´ú¼Æ´ÎÆ÷+1
+		it = it + 1;//è¿­ä»£è®¡æ¬¡å™¨+1
 
-		/******Step5 Êä³ö¼ÆËãlogÈÕÖ¾itÓëtol******/
+		/******Step5 è¾“å‡ºè®¡ç®—logæ—¥å¿—itä¸tol******/
 		cout << "it=" << it << "  " << "tol=" << tol << endl;
 
 	} while (tol > tolerance);
 
-	cout << "it=" << it << "  ÊÕÁ²" << endl;//Í¬ÎªÈÕÖ¾ÎÄ¼şÊä³ö
+	cout << "it=" << it << "  æ”¶æ•›" << endl;//åŒä¸ºæ—¥å¿—æ–‡ä»¶è¾“å‡º
 
-	/******Step6 ÊÍ·Å¾Ö²¿µÄ¶¯Ì¬Êı×éÄÚ´æ******/
-	delete[] x0;//ÊÍ·Å¶¯Ì¬Êı×é
+	/******Step6 é‡Šæ”¾å±€éƒ¨çš„åŠ¨æ€æ•°ç»„å†…å­˜******/
+	delete[] x0;//é‡Šæ”¾åŠ¨æ€æ•°ç»„
 
 }
 
-//ĞĞm>ÁĞn,×îĞ¡¶ş³Ë½â
+//è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£
 /*void LeastSquareSolution(double* x, double** A, double* b, int m, int n)
 {
-	//ÁÙÊ±±äÁ¿VTVºÍVTphi
+	//ä¸´æ—¶å˜é‡VTVå’ŒVTphi
 	double** ATA = new double* [n];
 	double* ATb = new double[n];
 	for (int i = 0; i < n; i++)
@@ -230,19 +230,19 @@ void Jacobi_Solver(double* x, double** A, double* b, int n, double tolerance)
 		for (int k = 0; k < m; k++)
 			ATb[i] += A[k][i] * b[k];
 	}
-	//µ÷ÓÃGuassSeidel¾ØÕóÇó½âÆ÷Çótheta
+	//è°ƒç”¨GuassSeidelçŸ©é˜µæ±‚è§£å™¨æ±‚theta
 	Guass_Seidel_Slover(x, ATA, ATb, n);
-	//ÊÍ·ÅÁÙÊ±±äÁ¿VTVºÍVTphi
+	//é‡Šæ”¾ä¸´æ—¶å˜é‡VTVå’ŒVTphi
 	for (int i = 0; i < n; i++)
 		delete[] ATA[i];
 	delete[] ATA;
 	delete[] ATb;
 }*/
 
-//ĞĞrow=m>ÁĞn=column,×îĞ¡¶ş³Ë½â
+//4-3è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£. row=m>n=column, Matrix equation solver, Least squares solution
 void LeastSquareSolution(double* x, double** A, double* b, int m, int n, double tolerance)
 {
-	//ÁÙÊ±±äÁ¿VTVºÍVTb
+	//ä¸´æ—¶å˜é‡VTVå’ŒVTb
 	double** ATA = new double* [n];
 	double* ATb = new double[n];
 	for (int i = 0; i < n; i++)
@@ -261,17 +261,17 @@ void LeastSquareSolution(double* x, double** A, double* b, int m, int n, double 
 		for (int k = 0; k < m; k++)
 			ATb[i] += A[k][i] * b[k];
 	}
-	//µ÷ÓÃGuassSeidel¾ØÕóÇó½âÆ÷Çóx
+	//è°ƒç”¨GuassSeidelçŸ©é˜µæ±‚è§£å™¨æ±‚x
 	Guass_Seidel_Slover(x, ATA, ATb, n, tolerance);
-	//ÊÍ·ÅÁÙÊ±±äÁ¿VTVºÍVTb
+	//é‡Šæ”¾ä¸´æ—¶å˜é‡VTVå’ŒVTb
 	for (int i = 0; i < n; i++)
 		delete[] ATA[i];
 	delete[] ATA;
 	delete[] ATb;
 }
 
-//ĞÂÔöº¯ÊıNew Functions
-//¾ØÕóµÄĞĞÁĞÊ½µÄÖµDeterminant of Matrix A
+//æ–°å¢å‡½æ•°New Functions
+//4-4çŸ©é˜µçš„è¡Œåˆ—å¼çš„å€¼Determinant of Matrix A
 double Determinant_of_Matrix(double** A, int n)//n=2or3
 {
 	if (n == 2)
@@ -286,7 +286,7 @@ double Determinant_of_Matrix(double** A, int n)//n=2or3
 		return 1.0;
 }
 
-//¾ØÕóµÄÄæn=2or3
+//4-5çŸ©é˜µçš„é€†n=2or3. Inverse of Matrix A.
 void Inverse_of_Matrix(double** InverseA, double** A, int n)
 {
 	if (n == 2)
@@ -298,8 +298,8 @@ void Inverse_of_Matrix(double** InverseA, double** A, int n)
 	}
 	else if (n == 3)
 	{
-		InverseA[0][0] = (A[1][1] * A[2][2] - A[1][2] * A[2][1]) / Determinant_of_Matrix(A, n);//´úÊıÓà×ÓÊ½algebraic complement
-		InverseA[1][0] = - (A[1][0] * A[2][2] - A[1][2] * A[2][0]) / Determinant_of_Matrix(A, n);//½µµÍ³ÌĞò¼ÆËãÁ¿,±ÜÃâ¶à´Îº¯Êıµ÷ÓÃ,±ÜÃâÁÙÊ±±äÁ¿ÉêÇë´«ÖµÊÍ·Å
+		InverseA[0][0] = (A[1][1] * A[2][2] - A[1][2] * A[2][1]) / Determinant_of_Matrix(A, n);//ä»£æ•°ä½™å­å¼algebraic complement
+		InverseA[1][0] = - (A[1][0] * A[2][2] - A[1][2] * A[2][0]) / Determinant_of_Matrix(A, n);//é™ä½ç¨‹åºè®¡ç®—é‡,é¿å…å¤šæ¬¡å‡½æ•°è°ƒç”¨,é¿å…ä¸´æ—¶å˜é‡ç”³è¯·ä¼ å€¼é‡Šæ”¾
 		InverseA[2][0] = (A[1][0] * A[2][1] - A[1][1] * A[2][0]) / Determinant_of_Matrix(A, n);//
 		InverseA[0][1] = -(A[0][1] * A[2][2] - A[0][2] * A[2][1]) / Determinant_of_Matrix(A, n);//
 		InverseA[1][1] = (A[0][0] * A[2][2] - A[0][2] * A[2][0]) / Determinant_of_Matrix(A, n);
@@ -311,7 +311,7 @@ void Inverse_of_Matrix(double** InverseA, double** A, int n)
 	else;
 }
 
-//¾ØÕó³ËÒÔÏòÁ¿y[m]=A[m][n]x[n] Matrix Vector Multiplication
+//4-6çŸ©é˜µä¹˜ä»¥å‘é‡y[m]=A[m][n]x[n] Matrix Vector Multiplication
 void Matrix_Vector_Multiplier(double* y, double** A, double* x, int m, int n)
 {		
 	for (int i = 0; i < m; i++)
@@ -322,7 +322,7 @@ void Matrix_Vector_Multiplier(double* y, double** A, double* x, int m, int n)
 	}		
 }
 
-//Äæ¾ØÕó·¨ÇóÏßĞÔ·½³Ì×éx=A-1* b
+//4-9é€†çŸ©é˜µæ³•æ±‚çº¿æ€§æ–¹ç¨‹ç»„x=A-1* b. Matrix Equation Solver, Inverse Matrix Method.
 void Matrix_Equation_Solver(double* x, double** A, double* b, int n)
 {
 	double** InverseA = new double* [n];
@@ -337,10 +337,10 @@ void Matrix_Equation_Solver(double* x, double** A, double* b, int n)
 
 }
 
-//ĞĞm>ÁĞn,×îĞ¡¶ş³Ë½â,ÇóÄæ·¨
+//4-10è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£,æ±‚é€†æ³•. row=m>n=column, Matrix equation solver, Least squares solution, Inverse Matrix Method.
 void LeastSquareSolution(double* x, double** A, double* b, int m, int n)
 {
-	//ÁÙÊ±±äÁ¿VTVºÍVTb
+	//ä¸´æ—¶å˜é‡VTVå’ŒVTb
 	double** ATA = new double* [n];
 	double* ATb = new double[n];
 	for (int i = 0; i < n; i++)
@@ -359,16 +359,16 @@ void LeastSquareSolution(double* x, double** A, double* b, int m, int n)
 		for (int k = 0; k < m; k++)
 			ATb[i] += A[k][i] * b[k];
 	}
-	//µ÷ÓÃMatrix_Equation_Solver¾ØÕóÇó½âÆ÷Çóx
+	//è°ƒç”¨Matrix_Equation_SolverçŸ©é˜µæ±‚è§£å™¨æ±‚x
 	Matrix_Equation_Solver(x, ATA, ATb, n);
-	//ÊÍ·ÅÁÙÊ±±äÁ¿VTVºÍVTb
+	//é‡Šæ”¾ä¸´æ—¶å˜é‡VTVå’ŒVTb
 	for (int i = 0; i < n; i++)
 		delete[] ATA[i];
 	delete[] ATA;
 	delete[] ATb;
 }
 
-//¾ØÕó³ËÒÔ¾ØÕóCik=AijBjk Matrix Matrix Multiplication
+//4-7çŸ©é˜µä¹˜ä»¥çŸ©é˜µCik=AijBjk Matrix Matrix Multiplication
 void Matrix_Matrix_Multiplier(double** C, double** A, double** B, int I, int J, int K)
 {
 	for(int i=0; i<I; i++)
@@ -380,7 +380,7 @@ void Matrix_Matrix_Multiplier(double** C, double** A, double** B, int I, int J, 
 		}
 }
 
-//¾ØÕó×ªÖÃ³ËÒÔ¾ØÕóVTV=VT[][]*V[m][n]m>n
+//4-8çŸ©é˜µè½¬ç½®ä¹˜ä»¥çŸ©é˜µVTV=VT[][]*V[m][n]m>n. Matrix Transpose times Matrix.
 void VT_V_Multiplier(double** VTV, double** V, int m, int n)
 {
 	for (int i = 0; i < n; i++)

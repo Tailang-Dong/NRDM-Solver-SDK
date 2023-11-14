@@ -1,7 +1,7 @@
 #include <iostream>
 #include "MechanicsLayer.h"
 #include "GeneralPhysicsLayer.h"
-//ÀàÍâÈ«¾Ö±äÁ¿¶¨Òå
+//ç±»å¤–å…¨å±€å˜é‡å®šä¹‰
 //2-3number of Nodes
 int Num_m = 1;
 //2-4Number of Neighbors
@@ -10,26 +10,26 @@ int* N_Nei=NULL;
 int** GlobalIndex_Nei = NULL;
 //2-5Vect[m][Nei][2] is the connectivity matrix of the m-th Node
 double*** Vect = NULL;
-double E = 2.0e11;//0-1µ¯ĞÔÄ£Á¿
-double nu = 0.3;//0-2²´ËÉ±È
-double G = E / 2 / (1 + nu);//0-3¼ôÇĞÄ£Á¿
+double E = 2.0e11;//0-1å¼¹æ€§æ¨¡é‡Young's modulus
+double nu = 0.3;//0-2æ³Šæ¾æ¯”Poisson's ratio
+double G = E / 2 / (1 + nu);//0-3å‰ªåˆ‡æ¨¡é‡shear modulus
 
-//2-1¼¸ºÎ·½³Ì
+//2-1å‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim, double tolerance)
 {
-	double** grad_disp = new double* [Dim];//2-1-1Î»ÒÆÌİ¶Ègrad_disp[][]
+	double** grad_disp = new double* [Dim];//2-1-1ä½ç§»æ¢¯åº¦grad_disp[][]
 	for (int i = 0; i < Dim; i++)
 		grad_disp[i] = new double[Dim];
-	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim, tolerance);//2-1-2µ÷ÓÃ3-2ÇóÎ»ÒÆÌİ¶È
+	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim, tolerance);//2-1-2è°ƒç”¨3-2æ±‚ä½ç§»æ¢¯åº¦
 	for (int i = 0; i < Dim; i++)
 		for (int j = 0; j < Dim; j++)
-			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3¸ù¾İÎ»ÒÆÌİ¶ÈÇóÓ¦±ä
-	for (int i = 0; i < Dim; i++)//2-1-4ÊÍ·ÅÁÙÊ±±äÁ¿grad_disp[][]
+			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3æ ¹æ®ä½ç§»æ¢¯åº¦æ±‚åº”å˜
+	for (int i = 0; i < Dim; i++)//2-1-4é‡Šæ”¾ä¸´æ—¶å˜é‡grad_disp[][]
 		delete[] grad_disp[i];
 	delete[] grad_disp;
 }
 
-//2-2±¾¹¹·½³Ì
+//2-2æœ¬æ„æ–¹ç¨‹constitutive equation solver
 void Stress_from_Strain(double** sigma, double E, double nu, double G, double** epsilon, int Dim)
 {
 	if (Dim == 2)
@@ -55,7 +55,7 @@ void Stress_from_Strain(double** sigma, double E, double nu, double G, double** 
 		}
 	}
 }
-//2DÆ½ÃæÓ¦Á¦
+//2Då¹³é¢åº”åŠ›plane stress
 void Stress_from_Strain2D(double** sigma, double E, double nu, double G, double** epsilon, int Dim)
 {
 	sigma[0][0] = E * (epsilon[0][0] + nu * epsilon[1][1]) / (1 - nu * nu);
@@ -80,84 +80,86 @@ void Stress_from_Strain3D(double** sigma, double E, double nu, double G, double*
 	}
 }
 
-//2-3-1Ó¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã
+//2-3-1åº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim, double tolerance)
 {
 	Divergence_of_Tensor(inforce, Vec, sigma_nei, sigma_m, n_nei, Dim, tolerance);
 }
-//2-3-2Ó¦Á¦ËãÄÚÁ¦-±ß½çµã
+//2-3-2åº”åŠ›ç®—å†…åŠ›-è¾¹ç•Œç‚¹evaluate internal force from stress, on boundary nodes
 void InForce_from_Stress_bdy(double* inforce, double** sigma_m, double* n_m, int Dim)
 {
 	for (int j = 0; j < Dim; j++)
 	{
 		inforce[j] = 0;
 		for (int i = 0; i < Dim; i++)
-			inforce[j] = inforce[j] - n_m[i] * sigma_m[i][j];//ÊÊÓÃÍâ·¨ÏòËãÄÚÁ¦
+			inforce[j] = inforce[j] - n_m[i] * sigma_m[i][j];//é€‚ç”¨å¤–æ³•å‘ç®—å†…åŠ›
 	}
 }
 
-/*Ò»-1´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î*/
-//2-1¼¸ºÎ·½³Ì
+/*overload I. call inverse matrix method to solve matrix equation*/
+/*é‡æ„ I. æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£*/
+//2-1-Iå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim)
 {
-	double** grad_disp = new double* [Dim];//2-1-1Î»ÒÆÌİ¶Ègrad_disp[][]
+	double** grad_disp = new double* [Dim];//2-1-1ä½ç§»æ¢¯åº¦grad_disp[][]
 	for (int i = 0; i < Dim; i++)
 		grad_disp[i] = new double[Dim];
-	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim);//2-1-2µ÷ÓÃ3-2ÇóÎ»ÒÆÌİ¶È
+	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim);//2-1-2è°ƒç”¨3-2æ±‚ä½ç§»æ¢¯åº¦
 	for (int i = 0; i < Dim; i++)
 		for (int j = 0; j < Dim; j++)
-			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3¸ù¾İÎ»ÒÆÌİ¶ÈÇóÓ¦±ä
-	for (int i = 0; i < Dim; i++)//2-1-4ÊÍ·ÅÁÙÊ±±äÁ¿grad_disp[][]
+			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3æ ¹æ®ä½ç§»æ¢¯åº¦æ±‚åº”å˜
+	for (int i = 0; i < Dim; i++)//2-1-4é‡Šæ”¾ä¸´æ—¶å˜é‡grad_disp[][]
 		delete[] grad_disp[i];
 	delete[] grad_disp;
 }
 
-//2-3-1Ó¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã
+//2-3-1-Iåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹. evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim)
 {
 	Divergence_of_Tensor(inforce, Vec, sigma_nei, sigma_m, n_nei, Dim);
 }
 
-//double** Inverse_VecTVec,
-/*¶ş´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î,Ê¹ÓÃÏÖ³ÉµÄInverse_VecTVec*/
-//2-1¼¸ºÎ·½³Ì
+/*overload II. call inverse matrix method to solve matrix equation, need Inverse_VecTVec[][]*/
+/*é‡æ„ II. æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£,éœ€è¦Inverse_VecTVec[][]*/
+//2-1-IIå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** Inverse_VecTVec, double** disp_nei, double* disp_m, int n_nei, int Dim)
 {
-	double** grad_disp = new double* [Dim];//2-1-1Î»ÒÆÌİ¶Ègrad_disp[][]
+	double** grad_disp = new double* [Dim];//2-1-1ä½ç§»æ¢¯åº¦grad_disp[][]
 	for (int i = 0; i < Dim; i++)
 		grad_disp[i] = new double[Dim];
-	Gradient_of_Vector(grad_disp, Vec, Inverse_VecTVec, disp_nei, disp_m, n_nei, Dim);//2-1-2µ÷ÓÃ3-2ÇóÎ»ÒÆÌİ¶È
+	Gradient_of_Vector(grad_disp, Vec, Inverse_VecTVec, disp_nei, disp_m, n_nei, Dim);//2-1-2è°ƒç”¨3-2æ±‚ä½ç§»æ¢¯åº¦
 	for (int i = 0; i < Dim; i++)
 		for (int j = 0; j < Dim; j++)
-			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3¸ù¾İÎ»ÒÆÌİ¶ÈÇóÓ¦±ä
-	for (int i = 0; i < Dim; i++)//2-1-4ÊÍ·ÅÁÙÊ±±äÁ¿grad_disp[][]
+			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3æ ¹æ®ä½ç§»æ¢¯åº¦æ±‚åº”å˜
+	for (int i = 0; i < Dim; i++)//2-1-4é‡Šæ”¾ä¸´æ—¶å˜é‡grad_disp[][]
 		delete[] grad_disp[i];
 	delete[] grad_disp;
 }
 
-//2-3-1Ó¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã
+//2-3-1-IIåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double** Inverse_VecTVec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim)
 {
 	Divergence_of_Tensor(inforce, Vec, Inverse_VecTVec, sigma_nei, sigma_m, n_nei, Dim);
 }
 
-/*Ò»-2´ÎÖØ¹¹-·½ÕóÇóÄæ½øĞĞÏßĞÔ·½³Ì×éÇó½â£¬²»ĞèÒªµü´úÈİ²î£¬¾ßÓĞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî*/
-//2-1¼¸ºÎ·½³Ì
+/*overload III. call inverse matrix method to solve matrix equation, weighted least square option*/
+/*é‡æ„III-æ–¹é˜µæ±‚é€†è¿›è¡Œçº¿æ€§æ–¹ç¨‹ç»„æ±‚è§£,å…·æœ‰åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹*/
+//2-1-IIIå‡ ä½•æ–¹ç¨‹geometric equation solver
 void Strain_from_Displacement(double** epsilon, double** Vec, double** disp_nei, double* disp_m, int n_nei, int Dim, bool WeightedLeastSquares)
 {
-	double** grad_disp = new double* [Dim];//2-1-1Î»ÒÆÌİ¶Ègrad_disp[][]
+	double** grad_disp = new double* [Dim];//2-1-1ä½ç§»æ¢¯åº¦grad_disp[][]
 	for (int i = 0; i < Dim; i++)
 		grad_disp[i] = new double[Dim];
-	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim, WeightedLeastSquares);//2-1-2µ÷ÓÃ3-2ÇóÎ»ÒÆÌİ¶È
+	Gradient_of_Vector(grad_disp, Vec, disp_nei, disp_m, n_nei, Dim, WeightedLeastSquares);//2-1-2è°ƒç”¨3-2æ±‚ä½ç§»æ¢¯åº¦
 	for (int i = 0; i < Dim; i++)
 		for (int j = 0; j < Dim; j++)
-			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3¸ù¾İÎ»ÒÆÌİ¶ÈÇóÓ¦±ä
-	for (int i = 0; i < Dim; i++)//2-1-4ÊÍ·ÅÁÙÊ±±äÁ¿grad_disp[][]
+			epsilon[i][j] = (grad_disp[i][j] + grad_disp[j][i]) / 2;//2-1-3æ ¹æ®ä½ç§»æ¢¯åº¦æ±‚åº”å˜
+	for (int i = 0; i < Dim; i++)//2-1-4é‡Šæ”¾ä¸´æ—¶å˜é‡grad_disp[][]
 		delete[] grad_disp[i];
 	delete[] grad_disp;
 }
 
-//2-3-1Ó¦Á¦ËãÄÚÁ¦-ÄÚ²¿µã
+//2-3-1-IIIåº”åŠ›ç®—å†…åŠ›-å†…éƒ¨ç‚¹evaluate internal force from stress, on internal nodes
 void InForce_from_Stress_in(double* inforce, double** Vec, double*** sigma_nei, double** sigma_m, int n_nei, int Dim, bool WeightedLeastSquares)
 {
 	Divergence_of_Tensor(inforce, Vec, sigma_nei, sigma_m, n_nei, Dim, WeightedLeastSquares);

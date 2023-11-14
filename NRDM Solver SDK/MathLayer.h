@@ -1,34 +1,34 @@
 #pragma once
-//·½ÕóÏµÊý¾ØÕóµÄ¾ØÕóÇó½âÆ÷Ax=b
-//xÎª½âÏòÁ¿µÄÖ¸ÕëAÎªÏµÊý¾ØÕóµÄÖ¸ÕëbÎª³£ÊýÏòÁ¿µÄÖ¸ÕënÎªÏòÁ¿Î¬ÊýtolranceÎªÔ¤Éè¾«¶È
+//æ–¹é˜µç³»æ•°çŸ©é˜µçš„çŸ©é˜µæ±‚è§£å™¨Ax=b,å‡½æ•°å£°æ˜Ž. Matrix equation solver, row = column, function declaration.
+//xä¸ºè§£å‘é‡çš„æŒ‡é’ˆAä¸ºç³»æ•°çŸ©é˜µçš„æŒ‡é’ˆbä¸ºå¸¸æ•°å‘é‡çš„æŒ‡é’ˆnä¸ºå‘é‡ç»´æ•°tolranceä¸ºé¢„è®¾ç²¾åº¦.x is the pointer to the solution vector, A is the pointer to the coefficient matrix, b is a pointer to a constant vector, n is the vector dimension, tolrance is preset precision.
 
-//4-1Jacobiµü´ú·¨ÉùÃ÷
+//4-1Jacobiè¿­ä»£æ³•å£°æ˜Ž. Jacobi iterative method solver function declaration.
 void Jacobi_Solver(double* x, double** A, double* b, int n, double tolerance);
 
-//4-2Guass-Seidelµü´úÇó½âÆ÷º¯ÊýÉùÃ÷
+//4-2Guass-Seidelè¿­ä»£æ±‚è§£å™¨å‡½æ•°å£°æ˜Ž. Guass-Seidel iterative method solver function declaration.
 void Guass_Seidel_Slover(double* x, double** A, double* b, int n, double tolerance);
-//4-2-2ÖØ¹¹Ò»ÏÂtoleranceÈ±Ê¡ÖµÎª1e-7
+//4-2-2é‡æž„ä¸€ä¸‹toleranceç¼ºçœå€¼ä¸º1e-7. overload of 4-2,  default tolerance=1e-7.
 void Guass_Seidel_Slover(double* x, double** A, double* b, int n);
 
-//4-3ÐÐm>ÁÐn,×îÐ¡¶þ³Ë½â,ATA·½Õóµü´úÈÝ²î
+//4-3è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£,ATAæ–¹é˜µè¿­ä»£å®¹å·®. row=m>n=column, Matrix equation solver, Least squares solution
 void LeastSquareSolution(double* x, double** A, double* b, int m, int n, double tolerance);
-//4-3-2ÖØ¹¹ÐÐm>ÁÐn,×îÐ¡¶þ³Ë½âATA·½Õóµü´úÈÝ²îÄ¬ÈÏ1e-7
+//4-3-2é‡æž„è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£ATAæ–¹é˜µè¿­ä»£å®¹å·®é»˜è®¤1e-7
 //void LeastSquareSolution(double* x, double** A, double* b, int m, int n);
 
-//ÐÂÔöº¯ÊýNew Functions
-//¾ØÕóµÄÐÐÁÐÊ½µÄÖµDeterminant of Matrix A
+//æ–°å¢žå‡½æ•°New Functions
+//4-4çŸ©é˜µçš„è¡Œåˆ—å¼çš„å€¼. Determinant of Matrix A.
 double Determinant_of_Matrix(double** A, int n);
-//¾ØÕóµÄÄæ,´ý²¹³ä
+//4-5çŸ©é˜µçš„é€†,å¾…è¡¥å……. Inverse of Matrix A.
 void Inverse_of_Matrix(double** InverseA, double** A, int n);
-//¾ØÕó³ËÒÔÏòÁ¿y=Ax Matrix Vector Multiplication
+//4-6çŸ©é˜µä¹˜ä»¥å‘é‡y=Ax. Matrix Vector Multiplication
 void Matrix_Vector_Multiplier(double* y, double** A, double* x, int m, int n);
-//Äæ¾ØÕó·¨ÇóÏßÐÔ·½³Ì×é
+//4-9é€†çŸ©é˜µæ³•æ±‚çº¿æ€§æ–¹ç¨‹ç»„. Matrix Equation Solver, Inverse Matrix Method.
 void Matrix_Equation_Solver(double* x, double** A, double* b, int n);
-//ÐÐm>ÁÐn,×îÐ¡¶þ³Ë½â,ÇóÄæ·¨
+//4-10è¡Œm>åˆ—n,æœ€å°äºŒä¹˜è§£,æ±‚é€†æ³•. row=m>n=column, Matrix equation solver, Least squares solution, Inverse Matrix Method.
 void LeastSquareSolution(double* x, double** A, double* b, int m, int n);
 
-//¾ØÕó³ËÒÔ¾ØÕóCik=AijBjk Matrix Matrix Multiplication
+//4-7çŸ©é˜µä¹˜ä»¥çŸ©é˜µCik=AijBjk. Matrix Matrix Multiplication
 void Matrix_Matrix_Multiplier(double** C, double** A, double** B, int i, int j, int k);
 
-//¾ØÕó×ªÖÃ³ËÒÔ¾ØÕóVTV=VT[][]*V[m][n]m>n
+//4-8çŸ©é˜µè½¬ç½®ä¹˜ä»¥çŸ©é˜µVTV=VT[][]*V[m][n]m>n. Matrix Transpose times Matrix.
 void VT_V_Multiplier(double** VTV, double** V, int m, int n);

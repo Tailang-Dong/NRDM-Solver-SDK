@@ -1,4 +1,4 @@
-﻿// MRDSolver.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+﻿// MRDSolver.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束. include "main" function. the program starts here and end here.
 
 #include <iostream>
 #include <fstream>
@@ -18,22 +18,22 @@ int main()
 	/******0Get ProjectFile & ConfigureFile******/
 	/*0-1-ProjectFile*/
 	 //1-字符串输入项目文件路径、转化为path、打开读取ProjectFile
-	cout << "请输入项目文件路径!\n";
-	string ProjectFilePathString;//项目文件路径字符串，接收用户输入
+	cout << "请输入项目文件路径!Please Input the ProjectFile Path!\n";
+	string ProjectFilePathString;//项目文件路径字符串，接收用户输入ProjectFilePathString from user
 	getline(std::cin, ProjectFilePathString);
-	cout << "您输入的路径为：" << ProjectFilePathString << "\n";
-	path ProjectFilePath(ProjectFilePathString);//项目文件路径，使用字符串变量初始化E:/NRDProject/Test2/Project.nrdmpro
+	cout << "您输入的路径为You have input:" << ProjectFilePathString << "\n";
+	path ProjectFilePath(ProjectFilePathString);//ProjectFilePath Assignment项目文件路径，使用字符串变量初始化,eg: E:/NRDProject/Test2/Project.nrdmpro
 	cout << "ProjectFilePath=" << ProjectFilePath << "\n";
-	//项目文件输入流全局已经定义
-	InputProjectFile.open(ProjectFilePath);//打开项目文件并
+	//项目文件输入流全局已经定义have been definited globally
+	InputProjectFile.open(ProjectFilePath);//打开项目文件并open the ProjectFile.
 	if (InputProjectFile.is_open())
-		cout << "打开项目文件成功！\n";
+		cout << "打开项目文件成功！open the ProjectFile successfully!\n";
 	else
 	{
-		cout << "打开项目文件失败！程序结束！\n";
+		cout << "打开项目文件失败！程序结束！failed to open the ProjectFile! program exit!\n";
 		exit(0);
 	}
-	//逐行读取ProjectFile内容，等号右边给全局变量
+	//逐行读取ProjectFile内容，等号右边给全局变量.read the ProjectFile line by line
 	string StringFromFileL, StringFromFileR;//临时变量
 	istringstream instr(StringFromFileR); //使用字符串流转化
 	//等待读取的全局变量
@@ -41,6 +41,7 @@ int main()
 	{
 		getline(InputProjectFile, StringFromFileL, '=');
 		getline(InputProjectFile, StringFromFileR);
+		istringstream instr(StringFromFileR);
 		if (StringFromFileL == "ProjectName")
 			ProjectName = StringFromFileR;
 		else if (StringFromFileL == "Dimension")
@@ -57,7 +58,7 @@ int main()
 	}
 
 	InputProjectFile.close();
-	//输出项目文件内容
+	//输出项目文件内容output the content of ProjectFile
 	cout << "ProjectName=" << ProjectName << "\n";
 	cout << "Dimension=" << Dimension << "\n";
 	cout << "ProjectPath=" << ProjectPath << "\n";
@@ -66,21 +67,22 @@ int main()
 	cout << "ConfigureFilePath=" << ConfigureFilePath << "\n";
 
 	/*0-2-ConfigureFile*/
-	//2-打开计算配置文件
+	//2-打开计算配置文件Open the ConfigureFile
 	InputConfigureFile;//项目文件输入流
-	InputConfigureFile.open(ConfigureFilePath);//打开配置文件
+	InputConfigureFile.open(ConfigureFilePath);//打开配置文件Open the ConfigureFile
 	if (InputConfigureFile.is_open())
-		cout << "打开配置文件成功！\n";
+		cout << "打开配置文件成功！Open the ConfigureFile successfully!\n";
 	else
 	{
-		cout << "打开配置文件失败！程序结束！\n";
+		cout << "打开配置文件失败！程序结束！failed to open the ConfigureFile! program exit!\n";
 		exit(0);
 	}
-	//待读取的全局变量
+	//待读取的全局变量varibles waiting to be read
 	while (!InputConfigureFile.eof())//判断是否达到文件尾部，循环取变量
 	{
 		getline(InputConfigureFile, StringFromFileL, '=');
 		getline(InputConfigureFile, StringFromFileR);
+		istringstream instr(StringFromFileR);
 		if (StringFromFileL == "UseBinaryModel")
 			instr >> UseBinaryModel;
 		else if (StringFromFileL == "YoungModulus")
@@ -123,38 +125,38 @@ int main()
 	G = E / 2 / (1 + nu);//计算剪切模量
 
 	/*0-3-ModelFile*/
-	//3-打开模型文件
+	//3-打开模型文件Open the ModelFile
 	if (UseBinaryModel == 1)
 		mfin.open(BinaryModelFilePath, ios::binary);
 	else
 		mfin.open(ASCIIModelFilePath);
 	if (mfin.is_open())
-		cout << "打开模型文件成功！\n";
+		cout << "打开模型文件成功！Open the ModelFile successfully!\n";
 	else
 	{
-		cout << "打开模型文件失败！程序结束！\n";
+		cout << "打开模型文件失败！程序结束！failed to open the ModelFile! program exit!\n";
 		exit(0);
 	}
 
-	//0-4粗糙移动率相关,一般用不上
+	//0-4粗糙移动率相关,一般用不上rough moving rate. useless
 	double K_in_Mutiply_InfluenceRadiusSqure = E * (3.0 - nu) / (1 - nu * nu) / 2;
 	double K_b_Mutiply_InfluenceRadius = E / (1 - nu * nu);
 	if (Dimension == 3)
 		double K_in_Mutiply_InfluenceRadiusSqure = E * (2.0 - nu) / (1 - nu * nu);
-	double L = 2.0;//仅验证算例用得上
+	double L = 2.0;//仅验证算例用得上. useful only for verification examples 1
 
 	cout << "G=" << G << "\n";
 	cout << "E=" << E << "\n";
 	cout << "nu=" << nu << "\n";
 
-	/******1初始化模型信息******/
+	/******1初始化模型信息initialize the model information******/
 	/****1-1Node数量****/
 	if (UseBinaryModel)
 		mfin.read((char*)&Num_m, sizeof Num_m);
 	else
 		mfin >> Num_m;
 	cout << "Num_m=" << Num_m << "\n";
-	/****1-2Node数据****/
+	/****1-2Node数据node data****/
 	m = new Node2D[Num_m];//在应用层提前申请好
 	if (UseBinaryModel)
 		mfin.read((char*)&(m[0]), (long long)Num_m * sizeof(m[0]));
@@ -219,8 +221,8 @@ int main()
 		}
 	}
 
-	mfin.close();//关闭数据文件
-	/****1-4connectivity数据导数矩阵组****/
+	mfin.close();//关闭数据文件.close the model file
+	/****1-4connectivity数据导数矩阵组array of derivative matrices****/
 	Vect = new double** [Num_m];
 	for (int p = 0; p < Num_m; p++)
 		Vect[p] = new double* [N_Nei[p]];
@@ -236,47 +238,6 @@ int main()
 				Vect[p][i][j] = m[glodex].X[j] - m[p].X[j];
 		}
 	}
-	/*是否最小二乘且加速,权值向量Weig[Ntotal][N_Nei[p]]*/
-	/*计算Inverse_VectTVect*/
-	double*** Inverse_VectTVect = new double** [Num_m];//全局,最后释放
-	for (int p = 0; p < Num_m; p++)
-		Inverse_VectTVect[p] = new double* [Dimension];
-	for (int p = 0; p < Num_m; p++)
-		for (int i = 0; i < Dimension; i++)
-			Inverse_VectTVect[p][i] = new double[Dimension];
-	double** temp_VTV = new double* [Dimension];//临时VTV,计算完释放
-	double** temp_InverseVTV = new double* [Dimension];//临时InverseVTV,计算完释放
-	for (int i = 0; i < Dimension; i++)
-	{
-		temp_VTV[i] = new double[Dimension];
-		temp_InverseVTV[i] = new double[Dimension];
-	}
-	double** temp_V = NULL;//临时,计算完释放
-	for (int p = 0; p < Num_m; p++)
-	{
-		temp_V = new double* [N_Nei[p]];//分配V的内存
-		for (int i = 0; i < N_Nei[p]; i++)
-			temp_V[i] = new double[Dimension];
-		for (int i = 0; i < N_Nei[p]; i++)
-			for (int j = 0; j < Dimension; j++)
-				temp_V[i][j] = Vect[p][i][j];//取V
-		VT_V_Multiplier(temp_VTV, temp_V, N_Nei[p], Dimension);//VTV
-		Inverse_of_Matrix(temp_InverseVTV, temp_VTV, Dimension);//VTV^-1
-		for (int i = 0; i < Dimension; i++)//保存VTV^-1
-			for (int j = 0; j < Dimension; j++)
-				Inverse_VectTVect[p][i][j] = temp_InverseVTV[i][j];
-		for (int i = 0; i < N_Nei[p]; i++)//释放V的内存,下个节点会重新申请
-			delete[] temp_V[i];
-		delete[] temp_V;
-	}
-	for (int i = 0; i < Dimension; i++)
-	{
-		delete[] temp_VTV[i];
-		delete[] temp_InverseVTV[i];
-	}
-	delete[] temp_VTV;//换节点不需要重新申请,循环完再释放
-	delete[] temp_InverseVTV;//换节点不需要重新申请,循环完再释放
-	/*计算Inverse_VectTVect完成*/
 
 	/****1-5计算移动刚度矩阵K[p][Dim][Dim]****/
 	std::cout << "开始计算MoveStiffness\n";
@@ -469,7 +430,7 @@ int main()
 	if (IfOutputMoveStiffness == 1)
 	{
 		ofstream Kout;
-		Kout.open(ProjectPath/"K.dat");
+		Kout.open(ProjectPath/"results/K.dat");
 		if(Dimension==2)
 			Kout << "VARIABLES=" << "\"X\"" << "\"Y\"" << "\"MoveStiffnessX\"" << "\"MoveStiffnessY\"" << "\n";
 		else
@@ -519,18 +480,18 @@ int main()
 	/******1初始化模型信息完成******/
 	/*部分文件设置*/
 	//收敛记录文件
-	Itfout.open(ProjectPath/"Iteration.dat");
+	Itfout.open(ProjectPath/"results/Iteration.dat");
 	Itfout << "VARIABLES=" << "\"Iteration\"" << "\"N_Residuals\"" << "\"Rate_Residuals\"" << "\"SpecificR_Max\"" << "\n";
 	//松弛记录文件
 	if (RecordRelaxation == 1)
 	{
-		RelaxOut.open(ProjectPath / "Deformation_Iteration.dat");
+		RelaxOut.open(ProjectPath / "results/Deformation_Iteration.dat");
 		RelaxOut << "TITLE = \"Results of Deformation\"" << "\n";//file header
 		RelaxOut << "FILETYPE = FULL" << "\n";
 		RelaxOut << "variables= \"x\" \"y\" \"DisplacementX\" \"DisplacementY\" \"sigmaXX\" \"sigmaYY\" \"sigmaXY\" \"ResiX\" \"ResiY\" \"ReX\" \"ReY\"\n";
 	}
 
-	/******2~4主循环******/
+	/******2~4主循环Main Loop******/
 	do
 	{
 		int Residuals = 0;
@@ -541,7 +502,6 @@ int main()
 		int n_nei = 0;
 		//临时变量-(nei1)导数矩阵V###########随时释放
 		double** V = NULL;
-		double** Inverse_VTV = NULL;//VTV^-1
 		//临时变量-(nei2)临近点位移disp_nei#########随时释放
 		double** disp_nei = NULL;
 		//(nei3)临时临近点应力
@@ -576,12 +536,6 @@ int main()
 			for (int i = 0; i < n_nei; i++)
 				for (int j = 0; j < Dimension; j++)
 					V[i][j] = Vect[p][i][j];
-			Inverse_VTV = new double* [Dimension];
-			for (int i = 0; i < Dimension; i++)
-				Inverse_VTV[i] = new double[Dimension];
-			for (int i = 0; i < Dimension; i++)
-				for (int j = 0; j < Dimension; j++)
-					Inverse_VTV[i][j] = Inverse_VectTVect[p][i][j];
 			//临时变量-(nei2)临近点位移disp_nei
 			disp_nei = new double* [n_nei];
 			for (int i = 0; i < n_nei; i++)
@@ -600,12 +554,8 @@ int main()
 			//(m2)epsi[][]局外
 
 			/**2-1-2计算应变存储在临时变量中**/
-			if(IfPrestoreInverseVTV==0)//不预存VTV^-1
-				Strain_from_Displacement(epsi, V, disp_nei, disp_m, n_nei, Dimension, IfWeightLeastSquares);
-			else
-				Strain_from_Displacement(epsi, V, Inverse_VTV, disp_nei, disp_m, n_nei, Dimension);
+			Strain_from_Displacement(epsi, V, disp_nei, disp_m, n_nei, Dimension, IfWeightLeastSquares);
 			
-
 			/**2-1-3把应变传值给节点**/
 			for (int i = 0; i < Dimension; i++)//算完传值给m
 				for (int j = 0; j < Dimension; j++)
@@ -615,9 +565,6 @@ int main()
 			for (int i = 0; i < n_nei; i++)
 				delete[] V[i];
 			delete[] V;//(nei1)释放导数矩阵V
-			for (int i = 0; i < Dimension; i++)
-				delete[] Inverse_VTV[i];
-			delete[] Inverse_VTV;//(nei1)释放VTV^-1
 			for (int i = 0; i < n_nei; i++)//(nei2)释放临时临近点位移disp_nei
 				delete[] disp_nei[i];
 			delete[] disp_nei;
@@ -653,12 +600,6 @@ int main()
 			for (int i = 0; i < n_nei; i++)
 				for (int j = 0; j < Dimension; j++)
 					V[i][j] = Vect[p][i][j];
-			Inverse_VTV = new double* [Dimension];
-			for (int i = 0; i < Dimension; i++)
-				Inverse_VTV[i] = new double[Dimension];
-			for (int i = 0; i < Dimension; i++)
-				for (int j = 0; j < Dimension; j++)
-					Inverse_VTV[i][j] = Inverse_VectTVect[p][i][j];
 			sigma_nei = new double** [n_nei];//(nei3)临时临近点应力
 			for (int n = 0; n < n_nei; n++)
 				sigma_nei[n] = new double* [Dimension];
@@ -680,12 +621,7 @@ int main()
 
 			/**2-3-2计算内力**/
 			if ((m[p].IfBoundary) == 0)//内部点
-			{
-				if (IfPrestoreInverseVTV == 0)//不预存VTV^-1
-					InForce_from_Stress_in(inforce, V, sigma_nei, sigm, n_nei, Dimension, IfWeightLeastSquares);
-				else
-					InForce_from_Stress_in(inforce, V, Inverse_VTV, sigma_nei, sigm, n_nei, Dimension);
-			}
+				InForce_from_Stress_in(inforce, V, sigma_nei, sigm, n_nei, Dimension, IfWeightLeastSquares);
 			else//外部点
 			{
 				InForce_from_Stress_bdy(inforce, sigm, n, Dimension);
@@ -700,9 +636,6 @@ int main()
 			for (int i = 0; i < n_nei; i++)
 				delete[] V[i];
 			delete[] V;//(nei1)释放导数矩阵V
-			for (int i = 0; i < Dimension; i++)
-				delete[] Inverse_VTV[i];
-			delete[] Inverse_VTV;//(nei1)释放VTV^-1
 			/****2-3应力算内力完成****/
 
 			/****2-4令余量=内力+外力****/
@@ -790,13 +723,14 @@ int main()
 		
 	} while (it_orien<= MaxIteration);
 	Itfout.close();
-	/******2~4主循环完成******/
+	/******2~4主循环完成Main Loop Over******/
 
-	/******5输出结果******/
+	/******5输出结果Output Results******/
 	//松弛记录关闭文件
-	RelaxOut.close();
-	/****5-1全场结果****/
-	fout.open(ProjectPath / "SimulatedStress.dat");
+	if (RecordRelaxation == 1)
+		RelaxOut.close();
+	/****5-1全场结果field results****/
+	fout.open(ProjectPath / "results/SimulatedStress.dat");
 	fout << "VARIABLES=" << "\"X\"" << "\"Y\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\"ReX\"" << "\"ReY\"" << "\n";
 	for (int p = 0; p < Num_m; p++)
 	{
@@ -811,7 +745,7 @@ int main()
 	/****5-2纵截面Y=0结果****/
 	if (OutputLongitudinalSection == 1)
 	{
-		LongSecfout.open(ProjectPath / "LongitudinalSection.dat");
+		LongSecfout.open(ProjectPath / "results/LongitudinalSection.dat");
 		LongSecfout << "VARIABLES=" << "\"X\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\n";
 		for (int p = 0; p < Num_m; p++)
 		{
@@ -824,7 +758,7 @@ int main()
 	/****5-3横截面X=L/2结果****/
 	if (OutputCrossSection == 1)
 	{
-		CrossSecfout.open(ProjectPath / "CrossSection.dat");
+		CrossSecfout.open(ProjectPath / "results/CrossSection.dat");
 		CrossSecfout << "VARIABLES=" << "\"Y\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\n";
 		for (int p = 0; p < Num_m; p++)
 		{
@@ -835,7 +769,7 @@ int main()
 	}
 	
 
-	//释放全局变量内存
+	//释放全局变量内存free the memory
 	delete[] m;
 	
 	for (int i = 0; i < Num_m; i++)
@@ -848,13 +782,6 @@ int main()
 	for (int p = 0; p < Num_m; p++)
 		delete[] Vect[p];
 	delete[] Vect;
-	//释放预计算VTV的逆
-	for (int p = 0; p < Num_m; p++)
-		for (int i = 0; i < Dimension; i++)
-			delete[] Inverse_VectTVect[p][i];
-	for (int p = 0; p < Num_m; p++)
-		delete[] Inverse_VectTVect[p];
-	delete[] Inverse_VectTVect;
 	//1-5-7释放移动刚度矩阵内存
 	for (int p = 0; p < Num_m; p++)
 		delete[] K[p];
@@ -865,7 +792,7 @@ int main()
 
 	delete[] N_Nei;
 
-	LogFout.open(ProjectPath / "Log.dat");
+	LogFout.open(ProjectPath / "results/Log.dat");
 	//cout << "The run time is:" << (double)clock() / CLOCKS_PER_SEC << "s" << endl;ResiToleranceInternal
 	cout << "计算完成！\n";
 	LogFout << "MoveCoefficient=" << MoveCoefficient << "\n";
