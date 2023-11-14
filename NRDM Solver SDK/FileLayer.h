@@ -1,20 +1,19 @@
 #pragma once
 #include <fstream>
-//5ÎÄ¼ş²ã5File Layer
-//ÌáÇ°×¼±¸ÎÄ¼şI/OÁ÷. prepare for file I/O
-//ÎÄ¼şÎÄ¼ş¼ĞµØÖ·¶ÔÏóµÈµÈfile path, folder path, path objects. etc.
+//5æ–‡ä»¶å±‚5File Layer
+//æå‰å‡†å¤‡æ–‡ä»¶I/Oæµ. prepare for file I/O
+//æ–‡ä»¶æ–‡ä»¶å¤¹åœ°å€å¯¹è±¡ç­‰ç­‰file path, folder path, path objects. etc.
 
-extern std::ifstream InputProjectFile;//ÏîÄ¿ÎÄ¼şÊäÈëÁ÷.InputProjectFile ifstream
-extern std::ifstream InputConfigureFile;//ÅäÖÃÎÄ¼şÊäÈëÁ÷.InputConfigureFile ifstream
+extern std::ifstream InputProjectFile;//é¡¹ç›®æ–‡ä»¶è¾“å…¥æµ.InputProjectFile ifstream
+extern std::ifstream InputConfigureFile;//é…ç½®æ–‡ä»¶è¾“å…¥æµ.InputConfigureFile ifstream
 
-extern std::ifstream mfin;//¶ÁÈ¡Ä£ĞÍÎÄ¼şÊäÈëÁ÷ifstream to read the model file
-extern std::ofstream fout;//½á¹ûÊä³öofstream to write the result file
-extern std::ofstream LongSecfout;//×İ½ØÃæ½á¹ûÊä³öofstream to write the result file. Longitudinal Section
-extern std::ofstream CrossSecfout;//ºá½ØÃæ½á¹ûÊä³öofstream to write the result file. Cross Section
-extern std::ofstream Itfout;//µü´úÖÁÊÕÁ²¼ÇÂ¼ofstream to write the result file. record the iteration curves.
-extern std::ofstream RelaxOut;//ËÉ³Ú¼ÇÂ¼ofstream to write the result file. record the iterations.
+extern std::ifstream mfin;//è¯»å–æ¨¡å‹æ–‡ä»¶è¾“å…¥æµifstream to read the model file
+extern std::ofstream fout;//ç»“æœè¾“å‡ºofstream to write the result file
+extern std::ofstream LongSecfout;//çºµæˆªé¢ç»“æœè¾“å‡ºofstream to write the result file. Longitudinal Section
+extern std::ofstream CrossSecfout;//æ¨ªæˆªé¢ç»“æœè¾“å‡ºofstream to write the result file. Cross Section
+extern std::ofstream Itfout;//è¿­ä»£è‡³æ”¶æ•›è®°å½•ofstream to write the result file. record the iteration curves.
+extern std::ofstream RelaxOut;//æ¾å¼›è®°å½•ofstream to write the result file. record the iterations.
 
-extern std::ofstream LogFout;//ÈÕÖ¾¼ÇÂ¼
+extern std::ofstream LogFout;//æ—¥å¿—è®°å½•
 
-extern double SpecificResidual_Max;//¼ÇÂ¼ËùÓĞ½ÚµãµÄÎŞÁ¿¸ÙÓàÁ¿¸÷·ÖÁ¿µÄ×î´óÖµrecord the R^s_max
-
+extern double SpecificResidual_Max;//è®°å½•æ‰€æœ‰èŠ‚ç‚¹çš„æ— é‡çº²ä½™é‡å„åˆ†é‡çš„æœ€å¤§å€¼record the R^s_max

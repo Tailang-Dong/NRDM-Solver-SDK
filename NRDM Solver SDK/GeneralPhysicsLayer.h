@@ -1,26 +1,26 @@
 #pragma once
-/*****Í¨ÓÃÎïÀí²ãÍ·ÎÄ¼ş, º¯ÊıÉùÃ÷. Header of GeneralPhysicsLayer, Founctions Declarations.******/
+/*****é€šç”¨ç‰©ç†å±‚å¤´æ–‡ä»¶, å‡½æ•°å£°æ˜. Header of GeneralPhysicsLayer, Founctions Declarations.******/
 
-/***×î³£ÓÃ£¬±»Á¦Ñ§²ãÕæÕıµ÷ÓÃµÄ.  most commonly called, Called by the mechanics layer***/
-/*½âÏßĞÔ·½³Ìµ÷ÓÃÇóÄæ·¨, ÊÇ·ñ²ÉÓÃ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî, Dim=2 or 3. call inverse method to solve matrix equation, with weighted least squares option.*/
-//3-1±êÁ¿³¡µÄÌİ¶ÈËã×Ó. Ìİ¶ÈGradphi[Dim], Çóµ¼¾ØÕóVec[n_nei][Dim], ÁÙ½üµãÊôĞÔphi_nei[n_nei], ÖĞĞÄµãÊôĞÔphi_m, ÁÙ½üµãÊın_nei, Î¬¶ÈDim, WeightedLeastSquaresÎª¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî
-//3-1gradient of scalar field. gradient=Gradphi[Dim], derivative Matix=Vec[n_nei][Dim], scalar on neighbors=phi_nei[n_nei], scalar on central point=phi_m, number of neighbors=n_nei, Î¬¶ÈDim, weighted least squares option=WeightedLeastSquares.
+/***æœ€å¸¸ç”¨ï¼Œè¢«åŠ›å­¦å±‚çœŸæ­£è°ƒç”¨çš„.  most commonly called, Called by the mechanics layer***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ˜¯å¦é‡‡ç”¨åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹, Dim=2 or 3. call inverse method to solve matrix equation, with weighted least squares option.*/
+//3-1æ ‡é‡åœºçš„æ¢¯åº¦ç®—å­. æ¢¯åº¦Gradphi[Dim], æ±‚å¯¼çŸ©é˜µVec[n_nei][Dim], ä¸´è¿‘ç‚¹å±æ€§phi_nei[n_nei], ä¸­å¿ƒç‚¹å±æ€§phi_m, ä¸´è¿‘ç‚¹æ•°n_nei, ç»´åº¦Dim, WeightedLeastSquaresä¸ºåŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹
+//3-1gradient of scalar field. gradient=Gradphi[Dim], derivative Matix=Vec[n_nei][Dim], scalar on neighbors=phi_nei[n_nei], scalar on central point=phi_m, number of neighbors=n_nei, ç»´åº¦Dim, weighted least squares option=WeightedLeastSquares.
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, bool WeightedLeastSquares);
 
-//3-2Ê¸Á¿³¡µÄÌİ¶ÈËã×Ó.Ìİ¶ÈGradE[Dim][Dim], Çóµ¼¾ØÕóVec[n_nei][Dim], ÁÙ½üµãÊôĞÔE_nei[n_nei][Dim], ÖĞĞÄµãÊôĞÔE_m[Dim], ÁÙ½üµãÊın_nei, Î¬¶ÈDim, WeightedLeastSquaresÎª¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî
-//3-2gradient of vector field. gradient=GradE[Dim][Dim], derivative Matix=Vec[n_nei][Dim], vector on neighbors=E_nei[n_nei][Dim], vector on central point=E_m[Dim], number of neighbors=n_nei, Î¬¶ÈDim, weighted least squares option=WeightedLeastSquares.
+//3-2çŸ¢é‡åœºçš„æ¢¯åº¦ç®—å­.æ¢¯åº¦GradE[Dim][Dim], æ±‚å¯¼çŸ©é˜µVec[n_nei][Dim], ä¸´è¿‘ç‚¹å±æ€§E_nei[n_nei][Dim], ä¸­å¿ƒç‚¹å±æ€§E_m[Dim], ä¸´è¿‘ç‚¹æ•°n_nei, ç»´åº¦Dim, WeightedLeastSquaresä¸ºåŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹
+//3-2gradient of vector field. gradient=GradE[Dim][Dim], derivative Matix=Vec[n_nei][Dim], vector on neighbors=E_nei[n_nei][Dim], vector on central point=E_m[Dim], number of neighbors=n_nei, ç»´åº¦Dim, weighted least squares option=WeightedLeastSquares.
 void Gradient_of_Vector(double** GradE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares);
 
-//3-3Ê¸Á¿³¡µÄÉ¢¶ÈËã×Ó.É¢¶ÈDivE, Çóµ¼¾ØÕóVec[n_nei][Dim], ÁÙ½üµãÊôĞÔE_nei[n_nei][Dim], ÖĞĞÄµãÊôĞÔE_m[Dim], ÁÙ½üµãÊın_nei, Î¬¶ÈDim, WeightedLeastSquaresÎª¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî
-//3-3divergence of vector field. gradient=DivE, derivative Matix=Vec[n_nei][Dim], vector on neighbors=E_nei[n_nei][Dim], vector on central point=E_m[Dim], number of neighbors=n_nei, Î¬¶ÈDim, weighted least squares option=WeightedLeastSquares.
+//3-3çŸ¢é‡åœºçš„æ•£åº¦ç®—å­.æ•£åº¦DivE, æ±‚å¯¼çŸ©é˜µVec[n_nei][Dim], ä¸´è¿‘ç‚¹å±æ€§E_nei[n_nei][Dim], ä¸­å¿ƒç‚¹å±æ€§E_m[Dim], ä¸´è¿‘ç‚¹æ•°n_nei, ç»´åº¦Dim, WeightedLeastSquaresä¸ºåŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹
+//3-3divergence of vector field. gradient=DivE, derivative Matix=Vec[n_nei][Dim], vector on neighbors=E_nei[n_nei][Dim], vector on central point=E_m[Dim], number of neighbors=n_nei, ç»´åº¦Dim, weighted least squares option=WeightedLeastSquares.
 void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_m, int n_nei, int Dim, bool WeightedLeastSquares);
 
-//3-4ÕÅÁ¿³¡µÄÉ¢¶ÈËã×Ó.É¢¶ÈGradT[Dim], Çóµ¼¾ØÕóVec[n_nei][Dim], ÁÙ½üµãÊôĞÔT_nei[n_nei][Dim][Dim], ÖĞĞÄµãÊôĞÔT_m[Dim][Dim], ÁÙ½üµãÊın_nei, Î¬¶ÈDim, WeightedLeastSquaresÎª¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî
-//3-4divergence of tensor field. gradient=GradT[Dim], derivative Matix=Vec[n_nei][Dim], tensor on neighbors=T_nei[n_nei][Dim][Dim], tensor on central point=T_m[Dim][Dim], number of neighbors=n_nei, Î¬¶ÈDim, weighted least squares option=WeightedLeastSquares.
+//3-4å¼ é‡åœºçš„æ•£åº¦ç®—å­.æ•£åº¦GradT[Dim], æ±‚å¯¼çŸ©é˜µVec[n_nei][Dim], ä¸´è¿‘ç‚¹å±æ€§T_nei[n_nei][Dim][Dim], ä¸­å¿ƒç‚¹å±æ€§T_m[Dim][Dim], ä¸´è¿‘ç‚¹æ•°n_nei, ç»´åº¦Dim, WeightedLeastSquaresä¸ºåŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹
+//3-4divergence of tensor field. gradient=GradT[Dim], derivative Matix=Vec[n_nei][Dim], tensor on neighbors=T_nei[n_nei][Dim][Dim], tensor on central point=T_m[Dim][Dim], number of neighbors=n_nei, ç»´åº¦Dim, weighted least squares option=WeightedLeastSquares.
 void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim, bool WeightedLeastSquares);
 
-/***ÖØÔØIII, ²»±»µ÷ÓÃÔçÆÚ°æ±¾. Overload III, early version, not be called***/
-/*½âÏßĞÔ·½³Ìµ÷ÓÃµü´ú·¨, ĞèÒªÔ¤Éè¾«¶È. call iterative method to solve matrix equation, need preset tolerance*/
+/***é‡è½½III, ä¸è¢«è°ƒç”¨æ—©æœŸç‰ˆæœ¬. Overload III, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨è¿­ä»£æ³•, éœ€è¦é¢„è®¾ç²¾åº¦. call iterative method to solve matrix equation, need preset tolerance*/
 //3-1-III
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim, double tolerance);
 //3-2-III
@@ -30,8 +30,8 @@ void Divergence_of_Vector(double &DivE, double** Vec, double** E_nei, double* E_
 //3-4-III
 void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim, double tolerance);
 
-/***ÖØÔØI,²»±»µ÷ÓÃÔçÆÚ°æ±¾. Overload I, early version, not be called***/
-/*½âÏßĞÔ·½³Ìµ÷ÓÃÇóÄæ·¨, ÎŞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî, Dim=2 or 3. call inverse method to solve matrix equation, No weighted least squares option*/
+/***é‡è½½I,ä¸è¢«è°ƒç”¨æ—©æœŸç‰ˆæœ¬. Overload I, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ— åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹, Dim=2 or 3. call inverse method to solve matrix equation, No weighted least squares option*/
 //3-1-I
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double* phi_nei, double phi_m, int n_nei, int Dim);
 //3-2-I
@@ -41,8 +41,8 @@ void Divergence_of_Vector(double& DivE, double** Vec, double** E_nei, double* E_
 //3-4-I
 void Divergence_of_Tensor(double* GradT, double** Vec, double*** T_nei, double** T_m, int n_nei, int Dim);
 
-/***ÖØÔØII,ÒÑ²»±»µ÷ÓÃµÄÔçÆÚ°æ±¾. Overload II, early version, not be called***/
-/*½âÏßĞÔ·½³Ìµ÷ÓÃÇóÄæ·¨, ÎŞ¼ÓÈ¨×îĞ¡¶ş³ËÑ¡Ïî,Dim=2 or 3.  ĞèÒªInverse_VecTVec[Dim][Dim]
+/***é‡è½½II,å·²ä¸è¢«è°ƒç”¨çš„æ—©æœŸç‰ˆæœ¬. Overload II, early version, not be called***/
+/*è§£çº¿æ€§æ–¹ç¨‹è°ƒç”¨æ±‚é€†æ³•, æ— åŠ æƒæœ€å°äºŒä¹˜é€‰é¡¹,Dim=2 or 3.  éœ€è¦Inverse_VecTVec[Dim][Dim]
 call inverse method to solve matrix equation, No weighted least squares option, need Inverse_VecTVec[Dim][Dim]*/
 //3-1-II
 void Gradient_of_Scalar(double* Gradphi, double** Vec, double** Inverse_VecTVec, double* phi_nei, double phi_m, int n_nei, int Dim);
