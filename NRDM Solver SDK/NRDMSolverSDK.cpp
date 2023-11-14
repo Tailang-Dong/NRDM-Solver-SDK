@@ -1,4 +1,4 @@
-﻿// MRDSolver.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束. include "main" function. the program starts here and end here.
+﻿// NRDSolver.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束. include "main" function. the program starts here and end here.
 
 #include <iostream>
 #include <fstream>
@@ -430,7 +430,7 @@ int main()
 	if (IfOutputMoveStiffness == 1)
 	{
 		ofstream Kout;
-		Kout.open(ProjectPath/"K.dat");
+		Kout.open(ProjectPath/"results/K.dat");
 		if(Dimension==2)
 			Kout << "VARIABLES=" << "\"X\"" << "\"Y\"" << "\"MoveStiffnessX\"" << "\"MoveStiffnessY\"" << "\n";
 		else
@@ -480,12 +480,12 @@ int main()
 	/******1初始化模型信息完成******/
 	/*部分文件设置*/
 	//收敛记录文件
-	Itfout.open(ProjectPath/"Iteration.dat");
+	Itfout.open(ProjectPath/"results/Iteration.dat");
 	Itfout << "VARIABLES=" << "\"Iteration\"" << "\"N_Residuals\"" << "\"Rate_Residuals\"" << "\"SpecificR_Max\"" << "\n";
 	//松弛记录文件
 	if (RecordRelaxation == 1)
 	{
-		RelaxOut.open(ProjectPath / "Deformation_Iteration.dat");
+		RelaxOut.open(ProjectPath / "results/Deformation_Iteration.dat");
 		RelaxOut << "TITLE = \"Results of Deformation\"" << "\n";//file header
 		RelaxOut << "FILETYPE = FULL" << "\n";
 		RelaxOut << "variables= \"x\" \"y\" \"DisplacementX\" \"DisplacementY\" \"sigmaXX\" \"sigmaYY\" \"sigmaXY\" \"ResiX\" \"ResiY\" \"ReX\" \"ReY\"\n";
@@ -727,9 +727,10 @@ int main()
 
 	/******5输出结果Output Results******/
 	//松弛记录关闭文件
-	RelaxOut.close();
+	if (RecordRelaxation == 1)
+		RelaxOut.close();
 	/****5-1全场结果field results****/
-	fout.open(ProjectPath / "SimulatedStress.dat");
+	fout.open(ProjectPath / "results/SimulatedStress.dat");
 	fout << "VARIABLES=" << "\"X\"" << "\"Y\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\"ReX\"" << "\"ReY\"" << "\n";
 	for (int p = 0; p < Num_m; p++)
 	{
@@ -744,7 +745,7 @@ int main()
 	/****5-2纵截面Y=0结果****/
 	if (OutputLongitudinalSection == 1)
 	{
-		LongSecfout.open(ProjectPath / "LongitudinalSection.dat");
+		LongSecfout.open(ProjectPath / "results/LongitudinalSection.dat");
 		LongSecfout << "VARIABLES=" << "\"X\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\n";
 		for (int p = 0; p < Num_m; p++)
 		{
@@ -757,7 +758,7 @@ int main()
 	/****5-3横截面X=L/2结果****/
 	if (OutputCrossSection == 1)
 	{
-		CrossSecfout.open(ProjectPath / "CrossSection.dat");
+		CrossSecfout.open(ProjectPath / "results/CrossSection.dat");
 		CrossSecfout << "VARIABLES=" << "\"Y\"" << "\"dispX\"" << "\"dispY\"" << "\"sigmaxx\"" << "\"sigmayy\"" << "\"sigmaxy\"" << "\"ResiX\"" << "\"ResiY\"" << "\n";
 		for (int p = 0; p < Num_m; p++)
 		{
@@ -791,7 +792,7 @@ int main()
 
 	delete[] N_Nei;
 
-	LogFout.open(ProjectPath / "Log.dat");
+	LogFout.open(ProjectPath / "results/Log.dat");
 	//cout << "The run time is:" << (double)clock() / CLOCKS_PER_SEC << "s" << endl;ResiToleranceInternal
 	cout << "计算完成！\n";
 	LogFout << "MoveCoefficient=" << MoveCoefficient << "\n";
